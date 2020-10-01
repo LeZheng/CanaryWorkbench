@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>HomeForm.ui.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>Workbench.qml</file>
+        <file>SystemMenu.qml</file>
+        <file>WorkBox.qml</file>
+        <file>TaskListForm.qml</file>
+    </qresource>
+    <qresource prefix="/img">
+        <file alias="main_bg">img/main_bg.png</file>
+        <file alias="ic_add_group">img/ic_add_group.png</file>
+        <file alias="ic_add">img/ic_add.svg</file>
+        <file alias="ic_clear">img/ic_clear.png</file>
+        <file alias="ic_close">img/ic_close.png</file>
+        <file alias="ic_delete">img/ic_delete.svg</file>
+        <file alias="ic_edit">img/ic_edit.svg</file>
+        <file alias="ic_menu">img/ic_menu.svg</file>
+        <file alias="ic_refresh">img/ic_refresh.png</file>
+        <file alias="ic_setting">img/ic_setting.png</file>
+    </qresource>
+</RCC>

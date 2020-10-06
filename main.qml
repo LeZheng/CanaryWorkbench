@@ -91,12 +91,27 @@ ApplicationWindow {
         orientation: Qt.Horizontal
 
         TaskListForm {
+            id: spaceListForm
+            currentIndex: workbenchPages.currentIndex
             SplitView.preferredWidth: window.width * 0.2
         }
 
-        Workbench {
-            id: stackView
+        SwipeView {
+            id: workbenchPages
+            orientation: Qt.Vertical
             SplitView.fillWidth: true
+            currentIndex: spaceListForm.currentIndex
+            Repeater {
+                model: spaceListForm.count
+                Loader {
+                    active: SwipeView.isCurrentItem || SwipeView.isNextItem
+                            || SwipeView.isPreviousItem
+                    sourceComponent: Workbench {
+                        id: workbench
+                        index: index
+                    }
+                }
+            }
         }
 
         WorkBox {

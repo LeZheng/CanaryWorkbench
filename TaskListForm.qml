@@ -9,6 +9,16 @@ Frame {
     height: 400
 
     property var currentItem: null
+    property alias currentIndex: listView.currentIndex
+    property alias count: spaceListModel.count
+
+    MouseArea {
+        anchors.fill: listView
+        acceptedButtons: Qt.RightButton
+        onClicked: {
+            contextMenu.popup(mouse.x, mouse.y)
+        }
+    }
 
     ListView {
         id: listView
@@ -45,7 +55,9 @@ Frame {
                         itemMenu.popup(row1)
                     } else {
                         listView.currentIndex = index
+                        currentItem = spaceListModel.get(index)
                     }
+                    mouse.accepted = true
                 }
             }
         }
@@ -71,15 +83,6 @@ Frame {
             onClicked: addAction.trigger(addButton)
         }
         footerPositioning: ListView.OverlayFooter
-
-        //        MouseArea {
-        //            anchors.fill: parent
-        //            acceptedButtons: Qt.RightButton
-        //            onClicked: {
-        //                contextMenu.spaceObj = null
-        //                contextMenu.popup(mouse.x, mouse.y)
-        //            }
-        //        }
     }
 
     Dialog {
@@ -121,12 +124,21 @@ Frame {
         }
     }
 
+    Menu {
+        id: contextMenu
+        Component.onCompleted: {
+            contextMenu.addAction(addAction)
+        }
+    }
+
     Action {
         id: editAction
+        icon.source: "img/ic_edit"
         text: "Edit"
     }
     Action {
         id: removeAction
+        icon.source: "img/ic_delete"
         text: "Remove"
         onTriggered: {
             workspaceModel.remove(itemMenu.spaceIndex)
@@ -136,6 +148,7 @@ Frame {
     Action {
         id: addAction
         text: "Add"
+        icon.source: "img/ic_add"
         onTriggered: {
             wsNameText.text = ""
             addSpaceDialog.open()

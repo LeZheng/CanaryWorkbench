@@ -7,6 +7,7 @@ Item {
     id: root
 
     property string colorKey
+    property int index: 0
 
     width: 400
     height: 400
@@ -39,6 +40,12 @@ Item {
             Drag.active: mouseArea.drag.active
             Drag.hotSpot.x: 32
             Drag.hotSpot.y: 32
+
+            Text {
+                id: name
+                text: index
+                color: "red"
+            }
         }
     }
 }

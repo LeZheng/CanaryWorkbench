@@ -15,25 +15,7 @@ Frame {
         anchors.fill: parent
         focus: true
         model: ListModel {
-            ListElement {
-                name: "Grey"
-                colorCode: "grey"
-            }
-
-            ListElement {
-                name: "Red"
-                colorCode: "red"
-            }
-
-            ListElement {
-                name: "Blue"
-                colorCode: "blue"
-            }
-
-            ListElement {
-                name: "Green"
-                colorCode: "green"
-            }
+            id: spaceListModel
         }
         delegate: Item {
             x: 5
@@ -45,19 +27,25 @@ Frame {
                 Rectangle {
                     width: 40
                     height: 40
-                    color: colorCode
                 }
 
                 Text {
                     text: name
                     anchors.verticalCenter: parent.verticalCenter
                     font.bold: true
+                    color: "white"
                 }
             }
             MouseArea {
                 anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onClicked: {
-                    listView.currentIndex = index
+                    if (mouse.button == Qt.RightButton) {
+                        itemMenu.spaceIndex = index
+                        itemMenu.popup(row1)
+                    } else {
+                        listView.currentIndex = index
+                    }
                 }
             }
         }
@@ -77,11 +65,21 @@ Frame {
         }
         //        highlightFollowsCurrentItem: false
         footer: Button {
+            id: addButton
             text: "add new"
             width: parent.width
-            onClicked: addSpaceDialog.open()
+            onClicked: addAction.trigger(addButton)
         }
         footerPositioning: ListView.OverlayFooter
+
+        //        MouseArea {
+        //            anchors.fill: parent
+        //            acceptedButtons: Qt.RightButton
+        //            onClicked: {
+        //                contextMenu.spaceObj = null
+        //                contextMenu.popup(mouse.x, mouse.y)
+        //            }
+        //        }
     }
 
     Dialog {
@@ -104,11 +102,51 @@ Frame {
         }
 
         onAccepted: {
-            console.log("accepted...")
+            if (wsNameText.text.length > 0) {
+                var item = {
+                    "name": wsNameText.text
+                }
+                workspaceModel.addJson(item)
+                spaceListModel.append(item)
+            }
         }
+    }
 
-        onRejected: {
-            console.log("rejected...")
+    Menu {
+        id: itemMenu
+        property int spaceIndex: 0
+        Component.onCompleted: {
+            itemMenu.addAction(removeAction)
+            itemMenu.addAction(editAction)
         }
+    }
+
+    Action {
+        id: editAction
+        text: "Edit"
+    }
+    Action {
+        id: removeAction
+        text: "Remove"
+        onTriggered: {
+            workspaceModel.remove(itemMenu.spaceIndex)
+            spaceListModel.remove(itemMenu.spaceIndex)
+        }
+    }
+    Action {
+        id: addAction
+        text: "Add"
+        onTriggered: {
+            wsNameText.text = ""
+            addSpaceDialog.open()
+        }
+    }
+
+    Component.onCompleted: {
+        var list = workspaceModel.listJson()
+        spaceListModel.clear()
+        list.forEach(function (w) {
+            spaceListModel.append(w)
+        })
     }
 }

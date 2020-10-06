@@ -30,13 +30,13 @@ set(TS_FILES canary-workbench_zh_CN.ts)
 
 if(ANDROID)
     add_library(canary-workbench SHARED
-      main.cpp cactor.cpp
+      main.cpp cactor.cpp workspace.cpp
       qml.qrc
       ${TS_FILES}
     )
 else()
     add_executable(canary-workbench
-      main.cpp cactor.cpp
+      main.cpp cactor.cpp workspace.cpp
       qml.qrc
       ${TS_FILES}
     )

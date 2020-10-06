@@ -4,20 +4,31 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "cactor.h"
+#include "workspace.h"
+#include <QQmlContext>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setOrganizationName("Skyline Application");
+    QCoreApplication::setOrganizationDomain("skyline.com");
+    QCoreApplication::setApplicationName("CanaryWorkspace");
 
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+
+    qmlRegisterUncreatableType<Workspace>("Workspace", 1,0,"Workspace",QLatin1String("Workspace are read-only"));
+    qmlRegisterUncreatableType<WorkspaceModel>("WorkspaceModel", 1,0,"WorkspaceModel",QLatin1String("WorkspaceModel are read-only"));
+
+    engine.rootContext()->setContextProperty("workspaceModel", new WorkspaceModel());
+
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-        &app, [url](QObject *obj, const QUrl &objUrl) {
-            if (!obj && url == objUrl)
-                QCoreApplication::exit(-1);
-        }, Qt::QueuedConnection);
+    &app, [url](QObject *obj, const QUrl &objUrl) {
+        if (!obj && url == objUrl)
+            QCoreApplication::exit(-1);
+    }, Qt::QueuedConnection);
     engine.load(url);
 
     return app.exec();

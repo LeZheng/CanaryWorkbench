@@ -15,6 +15,29 @@
     </message>
 </context>
 <context>
+    <name>WorkBox</name>
+    <message>
+        <location filename="WorkBox.qml" line="192"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WorkBox.qml" line="199"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WorkBox.qml" line="211"/>
+        <source>Clear All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WorkBox.qml" line="221"/>
+        <source>Add...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>main</name>
     <message>
         <location filename="main.qml" line="11"/>

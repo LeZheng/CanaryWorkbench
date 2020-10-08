@@ -3,6 +3,10 @@
 
 #include <QObject>
 #include <QThread>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QSettings>
 
 class CActor : public QObject
 {
@@ -74,6 +78,46 @@ signals:
     void typeChanged(QString type);
     void groupChanged(QString group);
     void nameChanged(QString name);
+};
+
+class CActorGroup : public QObject
+{
+    Q_OBJECT
+
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+
+public:
+    explicit CActorGroup(QObject *parent = nullptr);
+
+    QString name()
+    {
+        return mName;
+    }
+    void setName(const QString &name)
+    {
+        this->mName = name;
+        emit nameChanged(this->mName);
+    }
+
+private:
+    QString mName;
+
+signals:
+    void nameChanged(QString name);
+};
+
+class ActorModel : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit ActorModel(QObject *parent = nullptr);
+public slots:
+    Q_INVOKABLE QJsonArray listGroupJson();
+    Q_INVOKABLE void addGroupJson(QJsonValue json);
+    Q_INVOKABLE void removeGroup(int index);
+private:
+    QSettings *settings;
 };
 
 class CActorFactory

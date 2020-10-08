@@ -53,3 +53,29 @@ CActor *CActorFactory::create(const QString &json, QObject *parent)
 
     return nullptr;
 }
+
+CActorGroup::CActorGroup(QObject *parent) : QObject(parent) {}
+
+ActorModel::ActorModel(QObject *parent)
+{
+    this->settings = new QSettings("Actor Settings", QSettings::IniFormat, this);
+}
+
+QJsonArray ActorModel::listGroupJson()
+{
+    return this->settings->value("group-list").toJsonArray();
+}
+
+void ActorModel::addGroupJson(QJsonValue json)
+{
+    auto array = settings->value("group-list").toJsonArray();
+    array.append(json);
+    settings->setValue("group-list", array);
+}
+
+void ActorModel::removeGroup(int index)
+{
+    auto array = settings->value("group-list").toJsonArray();
+    array.removeAt(index);
+    settings->setValue("group-list", array);
+}

@@ -3,7 +3,6 @@ import QtQuick.Controls 2.13
 import QtQuick.Layouts 1.12
 import QtGraphicalEffects 1.12
 
-//import QtQuick.Dialogs 1.2
 Page {
     id: root
     width: 400
@@ -23,16 +22,11 @@ Page {
             anchors.fill: parent
 
             ComboBox {
+                currentIndex: 0
                 Layout.fillWidth: true
                 id: groupListBox
                 model: ListModel {
                     id: groupListModel
-                    ListElement {
-                        text: "user"
-                    }
-                    ListElement {
-                        text: "system"
-                    }
                 }
             }
 
@@ -42,6 +36,13 @@ Page {
                 onClicked: {
                     addGroupDialog.open()
                 }
+            }
+
+            ToolButton {
+                id: removeGroupButton
+                icon.source: "img/ic_delete"
+                enabled: groupListBox.currentText != "all"
+                onClicked: removeGroupDialog.open()
             }
         }
     }
@@ -87,6 +88,12 @@ Page {
         }
     }
 
+    MouseArea {
+        anchors.fill: gridView
+        acceptedButtons: Qt.RightButton
+        onClicked: contextMenu.popup(mouse.x, mouse.y)
+    }
+
     GridView {
         id: gridView
         anchors.fill: parent
@@ -114,6 +121,7 @@ Page {
             }
         }
         delegate: Item {
+            id: itemRoot
             x: 5
             width: gridView.cellWidth
             height: gridView.cellHeight
@@ -135,7 +143,11 @@ Page {
             MouseArea {
                 drag.target: row1
                 anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onClicked: {
+                    if (mouse.button == Qt.RightButton) {
+                        itemMenu.popup(itemRoot, mouse.x, mouse.y)
+                    }
                     gridView.currentIndex = index
                 }
             }
@@ -173,6 +185,56 @@ Page {
         }
     }
 
+    Menu {
+        id: itemMenu
+
+        MenuItem {
+            text: qsTr("Delete")
+            icon.source: "img/ic_delete"
+            onClicked: {
+
+            }
+        }
+        MenuItem {
+            text: qsTr("Edit")
+            icon.source: "img/ic_edit"
+            onClicked: {
+
+            }
+        }
+    }
+
+    Menu {
+        id: contextMenu
+
+        MenuItem {
+            text: qsTr("Clear All")
+            icon.source: "img/ic_clear"
+            onClicked: {
+
+            }
+        }
+
+        MenuSeparator {}
+
+        Menu {
+            title: qsTr("Add...")
+
+            MenuItem {
+                text: "Function"
+                onTriggered: {
+
+                }
+            }
+            MenuItem {
+                text: "Cmd"
+                onTriggered: {
+
+                }
+            }
+        }
+    }
+
     Dialog {
         id: addGroupDialog
         width: 300
@@ -188,16 +250,41 @@ Page {
             selectByMouse: true
         }
 
-        onOpened: {
-            groupNameText.text = ""
-        }
+        onOpened: groupNameText.text = ""
 
         onAccepted: {
-            console.log("accepted...")
+            if (groupNameText.text.trim().length > 0) {
+                var item = {
+                    "name": groupNameText.text
+                }
+                actorModel.addGroupJson(item)
+                groupListModel.append(item)
+            }
         }
+    }
 
-        onRejected: {
-            console.log("rejected...")
+    Dialog {
+        id: removeGroupDialog
+        width: 400
+        height: 150
+        anchors.centerIn: Overlay.overlay
+        title: "Are you confirm to delete the group?"
+        standardButtons: Dialog.Yes | Dialog.No
+        parent: Overlay.overlay
+
+        onAccepted: {
+            actorModel.removeGroup(groupListBox.currentIndex - 1)
+            groupListModel.remove(groupListBox.currentIndex)
         }
+    }
+
+    Component.onCompleted: {
+        var groupList = actorModel.listGroupJson()
+        groupListModel.append({
+                                  "name": "all"
+                              })
+        groupList.forEach(function (group) {
+            groupListModel.append(group)
+        })
     }
 }

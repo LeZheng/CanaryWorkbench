@@ -104,11 +104,16 @@ ApplicationWindow {
             Repeater {
                 model: spaceListForm.count
                 Loader {
+                    asynchronous: true
                     active: SwipeView.isCurrentItem || SwipeView.isNextItem
                             || SwipeView.isPreviousItem
                     sourceComponent: Workbench {
                         id: workbench
                         index: index
+                    }
+
+                    onLoaded: {
+                        console.log("loaded:" + index)
                     }
                 }
             }

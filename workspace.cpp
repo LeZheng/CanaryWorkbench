@@ -1,6 +1,7 @@
 #include "workspace.h"
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMetaMethod>
 
 Workspace::Workspace(QObject *parent):QObject(parent)
 {
@@ -96,4 +97,38 @@ void WorkspaceModel::remove(int index)
 Pipe::Pipe(QObject *parent):QObject(parent)
 {
 
+}
+
+ActorDevice::ActorDevice(QObject *parent) : QObject(parent) {}
+
+QStringList ActorDevice::getSlots()
+{
+    QList<QString> slotList;
+    CActor *actor = nullptr; //TODO get from ActorModel;
+    if (actor) {
+        auto mObject = actor->metaObject();
+        for (int i = 0; i < mObject->methodCount(); i++) {
+            auto method = mObject->method(i);
+            if (method.methodType() == QMetaMethod::Slot && method.access() == QMetaMethod::Public) {
+                slotList.append(method.name());
+            }
+        }
+    }
+    return slotList;
+}
+
+QStringList ActorDevice::getSignals()
+{
+    QList<QString> signalList;
+    CActor *actor = nullptr; //TODO get from ActorModel;
+    if (actor) {
+        auto mObject = actor->metaObject();
+        for (int i = 0; i < mObject->methodCount(); i++) {
+            auto method = mObject->method(i);
+            if (method.methodType() == QMetaMethod::Signal && method.access() == QMetaMethod::Public) {
+                signalList.append(method.name());
+            }
+        }
+    }
+    return signalList;
 }

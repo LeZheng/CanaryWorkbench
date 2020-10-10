@@ -5,6 +5,7 @@
 #include <QJsonArray>
 #include <QSettings>
 #include <QQmlListProperty>
+#include "cactor.h"
 
 
 class Pipe : public QObject
@@ -42,6 +43,42 @@ private:
 signals:
     void inputIdChanged(QString inputId);
     void outputIdChanged(QString inputId);
+};
+
+class ActorDevice : public QObject
+{
+    Q_OBJECT
+
+    Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(QString actorId READ actorId WRITE setActorId NOTIFY actorIdChanged)
+public:
+    explicit ActorDevice(QObject *parent = nullptr);
+
+    void setId(const QString &id)
+    {
+        this->mId = id;
+        emit idChanged(mId);
+    }
+    QString id() { return mId; }
+
+    void setActorId(const QString &id)
+    {
+        this->mActorId = id;
+        emit actorIdChanged(mActorId);
+    }
+    QString actorId() { return mActorId; }
+
+public slots:
+    QStringList getSlots();
+    QStringList getSignals();
+
+private:
+    QString mId;
+    QString mActorId;
+
+signals:
+    void idChanged(QString id);
+    void actorIdChanged(QString actorId);
 };
 
 class Workspace:public QObject

@@ -31,10 +31,22 @@ CActor *CActorFactory::create(const QString &json, QObject *parent)
 {
     auto jsonDoc = QJsonDocument::fromJson(json.toLocal8Bit());
     if (jsonDoc.isObject()) {
+        return create(jsonDoc.object(), parent);
+    } else {
+//TODO error
+    }
+
+    return nullptr;
+}
+
+CActor *CActorFactory::create(const QJsonObject &jsonObj, QObject *parent)
+{
+    if (jsonObj.isEmpty()) {
+        return nullptr;
+    } else {
         auto actor = new CActor(parent);
-        auto jsonObj = jsonDoc.object();
         auto typeValue = jsonObj["type"];
-        if(typeValue.isUndefined()) {
+        if (typeValue.isUndefined()) {
             return actor;
         } else {
             auto metaObj = actor->metaObject();
@@ -47,11 +59,7 @@ CActor *CActorFactory::create(const QString &json, QObject *parent)
             //TODO create actor
             return actor;
         }
-    } else {
-//TODO error
     }
-
-    return nullptr;
 }
 
 CActorGroup::CActorGroup(QObject *parent) : QObject(parent) {}
@@ -59,6 +67,18 @@ CActorGroup::CActorGroup(QObject *parent) : QObject(parent) {}
 ActorModel::ActorModel(QObject *parent)
 {
     this->settings = new QSettings("Actor Settings", QSettings::IniFormat, this);
+    auto actorArray = this->settings->value("actor-list").toJsonArray();
+    foreach (auto actorValue, actorArray) {
+        auto actor = CActorFactory::create(actorValue.toObject());
+        if (actor) {
+            actorMap.insert(actor->id(), actor);
+        }
+    }
+}
+
+CActor *ActorModel::getActor(const QString &id)
+{
+    return actorMap.value(id, nullptr);
 }
 
 QJsonArray ActorModel::listGroupJson()

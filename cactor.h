@@ -112,18 +112,22 @@ class ActorModel : public QObject
 
 public:
     explicit ActorModel(QObject *parent = nullptr);
+
+    CActor *getActor(const QString &id);
 public slots:
     Q_INVOKABLE QJsonArray listGroupJson();
     Q_INVOKABLE void addGroupJson(QJsonValue json);
     Q_INVOKABLE void removeGroup(int index);
 private:
     QSettings *settings;
+    QMap<QString, CActor *> actorMap;
 };
 
 class CActorFactory
 {
 public:
     static CActor* create(const QString &json, QObject *parent = nullptr);
+    static CActor* create(const QJsonObject &json, QObject *parent = nullptr);
 };
 
 class CmdActor : public CActor

@@ -44,21 +44,28 @@ CActor *CActorFactory::create(const QJsonObject &jsonObj, QObject *parent)
     if (jsonObj.isEmpty()) {
         return nullptr;
     } else {
-        auto actor = new CActor(parent);
         auto typeValue = jsonObj["type"];
         if (typeValue.isUndefined()) {
-            return actor;
+            return nullptr;
         } else {
+            auto actor = newActor(typeValue.toString(),parent);
             auto metaObj = actor->metaObject();
             foreach (auto key, jsonObj.keys()) {
                 if (metaObj->indexOfProperty(key.toStdString().data()) >= 0) {
                     actor->setProperty(key.toStdString().data(), jsonObj[key].toVariant());
                 }
             }
-
-            //TODO create actor
             return actor;
         }
+    }
+}
+
+CActor *CActorFactory::newActor(const QString &type, QObject *parent)
+{
+    if (type == "cmd") {//TODO use map
+        return new CmdActor(parent);
+    } else {
+        return new CActor(parent);
     }
 }
 
@@ -98,4 +105,68 @@ void ActorModel::removeGroup(int index)
     auto array = settings->value("group-list").toJsonArray();
     array.removeAt(index);
     settings->setValue("group-list", array);
+}
+
+void ActorModel::addActor(QJsonObject json)
+{
+    auto actor = CActorFactory::create(json, this);
+    if (actor) {
+        actorMap.insert(actor->name(), actor);
+        auto actorArray = this->settings->value("actor-list").toJsonArray();
+        actorArray.append(json);
+        this->settings->setValue("actor-list", actorArray);
+    }
+}
+
+QJsonArray ActorModel::getGroupActors(QString group)
+{
+    QJsonArray array;
+    auto actorArray = this->settings->value("actor-list").toJsonArray();
+    foreach (auto actor, actorArray) {
+        if (actor.toObject().value("group").toString() == group) {
+            array.append(actor);
+        }
+    }
+    return array;
+}
+
+void ActorModel::removeActor(QString name)
+{
+    auto actor = actorMap.take(name);
+    if (actor) {
+        actor->deleteLater();
+    }
+    auto actorArray = this->settings->value("actor-list").toJsonArray();
+    for (int i = 0; i < actorArray.size(); i++) {
+        if (name == actorArray.at(i).toObject().value("name").toString()) {
+            actorArray.removeAt(i);
+            break;
+        }
+    }
+    this->settings->setValue("actor-list", actorArray);
+}
+
+void ActorModel::removeActors(QString groupName)
+{
+    auto actorArray = this->settings->value("actor-list").toJsonArray();
+    QJsonArray newArray;
+    foreach (auto actor, actorArray) {
+        if (actor.toObject().value("group") != groupName) {
+            newArray.append(actor);
+        } else {
+            auto a = actorMap.take(actor.toObject().value("name").toString());
+            a->deleteLater();
+        }
+    }
+    this->settings->setValue("actor-list", newArray);
+}
+
+CmdActor::CmdActor(QObject *parent):CActor(parent)
+{
+
+}
+
+void CmdActor::send(const QString &msg)
+{
+    //TODO
 }

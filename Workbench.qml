@@ -2,8 +2,9 @@ import QtQuick 2.4
 
 import QtQuick 2.4
 import QtQuick.Controls 2.12
+import QtGraphicalEffects 1.0
 
-Item {
+Pane {
     id: root
 
     property string colorKey
@@ -11,14 +12,11 @@ Item {
 
     width: 400
     height: 400
-
-    property var tileObj: tile
-
-    Pane {
-        anchors.fill: parent
-        anchors.margins: 10
+    background: FastBlur {
         opacity: 0.7
+        radius: 25
     }
+    property var tileObj: tile
 
     MouseArea {
         id: mouseArea

@@ -41,7 +41,7 @@ Page {
             ToolButton {
                 id: removeGroupButton
                 icon.source: "img/ic_delete"
-                enabled: groupListBox.currentText != "all"
+                enabled: groupListBox.currentText != "default"
                 onClicked: removeGroupDialog.open()
             }
         }
@@ -89,49 +89,30 @@ Page {
     }
 
     MouseArea {
-        anchors.fill: gridView
+        anchors.fill: actorSetView
         acceptedButtons: Qt.RightButton
         onClicked: contextMenu.popup(mouse.x, mouse.y)
     }
 
     GridView {
-        id: gridView
+        id: actorSetView
         anchors.fill: parent
         anchors.margins: 8
         focus: true
         model: ListModel {
-            ListElement {
-                name: "Grey"
-                colorCode: "grey"
-            }
-
-            ListElement {
-                name: "Red"
-                colorCode: "red"
-            }
-
-            ListElement {
-                name: "Blue"
-                colorCode: "blue"
-            }
-
-            ListElement {
-                name: "Green"
-                colorCode: "green"
-            }
+            id: actorListModel
         }
         delegate: Item {
             id: itemRoot
             x: 5
-            width: gridView.cellWidth
-            height: gridView.cellHeight
+            width: actorSetView.cellWidth
+            height: actorSetView.cellHeight
             Row {
                 id: row1
                 spacing: 10
                 Rectangle {
                     width: 40
                     height: 40
-                    color: colorCode
                 }
 
                 Text {
@@ -148,7 +129,7 @@ Page {
                     if (mouse.button == Qt.RightButton) {
                         itemMenu.popup(itemRoot, mouse.x, mouse.y)
                     }
-                    gridView.currentIndex = index
+                    actorSetView.currentIndex = index
                 }
             }
         }
@@ -168,20 +149,53 @@ Page {
         }
     }
 
+    Action {
+        id: addCmdAction
+        text: "Cmd"
+        onTriggered: addCmdDialog.open()
+    }
+
+    Action {
+        id: addFunctionAction
+        text: "function"
+    }
+
+    Action {
+        id: deleteActorAction
+        text: qsTr("Delete")
+        icon.source: "img/ic_delete"
+        onTriggered: {
+            let actorName = actorListModel.get(actorSetView.currentIndex).name
+            actorModel.removeActor(actorName)
+            actorListModel.remove(actorSetView.currentIndex)
+        }
+    }
+
+    Action {
+        id: editActorAction
+        text: qsTr("Edit")
+        icon.source: "img/ic_edit"
+    }
+
+    Action {
+        id: clearAllAction
+        text: qsTr("Clear All")
+        icon.source: "img/ic_clear"
+        onTriggered: {
+            let groupName = groupListBox.currentText
+            actorModel.removeActors(groupName)
+            actorListModel.clear()
+        }
+    }
+
     Menu {
         id: addMenu
 
         MenuItem {
-            text: "function"
-            onTriggered: {
-
-            }
+            action: addFunctionAction
         }
         MenuItem {
-            text: "cmd"
-            onTriggered: {
-
-            }
+            action: addCmdAction
         }
     }
 
@@ -189,18 +203,10 @@ Page {
         id: itemMenu
 
         MenuItem {
-            text: qsTr("Delete")
-            icon.source: "img/ic_delete"
-            onClicked: {
-
-            }
+            action: deleteActorAction
         }
         MenuItem {
-            text: qsTr("Edit")
-            icon.source: "img/ic_edit"
-            onClicked: {
-
-            }
+            action: editActorAction
         }
     }
 
@@ -208,11 +214,7 @@ Page {
         id: contextMenu
 
         MenuItem {
-            text: qsTr("Clear All")
-            icon.source: "img/ic_clear"
-            onClicked: {
-
-            }
+            action: clearAllAction
         }
 
         MenuSeparator {}
@@ -221,16 +223,10 @@ Page {
             title: qsTr("Add...")
 
             MenuItem {
-                text: "Function"
-                onTriggered: {
-
-                }
+                action: addFunctionAction
             }
             MenuItem {
-                text: "Cmd"
-                onTriggered: {
-
-                }
+                action: addCmdAction
             }
         }
     }
@@ -278,13 +274,67 @@ Page {
         }
     }
 
+    Dialog {
+        id: addCmdDialog
+        width: 400
+        anchors.centerIn: Overlay.overlay
+
+        title: "Please input group name"
+        standardButtons: Dialog.Save | Dialog.Cancel
+        parent: Overlay.overlay
+
+        GridLayout {
+            anchors.fill: parent
+            columns: 2
+            Label {
+                text: "Name:"
+            }
+            TextField {
+                id: cmdNameField
+                Layout.fillWidth: true
+                selectByMouse: true
+            }
+            Label {
+                text: "Command:"
+            }
+            TextField {
+                id: cmdTextField
+                Layout.fillWidth: true
+                selectByMouse: true
+            }
+        }
+
+        onAccepted: {
+            let actor = {
+                "id": cmdNameField.text,
+                "name": cmdNameField.text,
+                "cmd": cmdTextField.text,
+                "group": groupListBox.currentText,
+                "type": "cmd"
+            }
+
+            actorModel.addActor(actor)
+            actorListModel.append(actor)
+        }
+    }
+
     Component.onCompleted: {
         var groupList = actorModel.listGroupJson()
         groupListModel.append({
-                                  "name": "all"
+                                  "name": "default"
                               })
         groupList.forEach(function (group) {
             groupListModel.append(group)
+        })
+
+        loadActor()
+    }
+
+    function loadActor() {
+        let actorList = actorModel.getGroupActors(groupListBox.currentText)
+        actorListModel.clear()
+        actorList.forEach(function (actor) {
+            actorListModel.append(actor)
         })
     }
 }

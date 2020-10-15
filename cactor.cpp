@@ -166,7 +166,37 @@ CmdActor::CmdActor(QObject *parent):CActor(parent)
 
 }
 
+void CmdActor::start()
+{
+    this->process = new QProcess(this);
+    this->process->start(mCmd);
+
+    connect(this->process, &QProcess::readyRead, this, [this]() {
+        QString msg(this->process->readAll());
+        emit received(msg);
+    });
+
+    connect(this->process, &QProcess::stateChanged, this, [this](QProcess::ProcessState newState) {
+        //TODO
+    });
+
+    connect(this->process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
+        //TODO
+    });
+}
+
+void CmdActor::stop()
+{
+    if (this->process && this->process->state() != QProcess::NotRunning) {
+        this->process->kill();
+        this->process->deleteLater();
+        this->process = nullptr;
+    }
+}
+
 void CmdActor::send(const QString &msg)
 {
-    //TODO
+    if (this->process && this->process->state() == QProcess::Running) {
+        this->process->write(msg.toUtf8());
+    }
 }

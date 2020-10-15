@@ -16,34 +16,51 @@ Pane {
         opacity: 0.7
         radius: 25
     }
-    property var tileObj: tile
 
-    MouseArea {
-        id: mouseArea
-        width: 64
-        height: 64
-        drag.target: tile
-        drag.threshold: 5
+    DropArea {
+        id: destArea
+        anchors.fill: parent
+        z: -1
 
-        Rectangle {
-            id: tile
-            width: 64
-            height: 64
+        onEntered: {
+            drag.accepted = true
+            followItem.source = drag.getDataAsString("form")
+            followItem.active = true
+        }
 
-            //            anchors.verticalCenter: parent.verticalCenter
-            //            anchors.horizontalCenter: parent.horizontalCenter
-            color: colorKey
+        onPositionChanged: {
+            drag.accepted = true
+            followItem.x = drag.x - 4
+            followItem.y = drag.y - 4
+        }
 
-            Drag.keys: [colorKey]
-            Drag.active: mouseArea.drag.active
-            Drag.hotSpot.x: 32
-            Drag.hotSpot.y: 32
-
-            Text {
-                id: name
-                text: index
-                color: "red"
+        onDropped: {
+            if (drop.supportedActions == Qt.CopyAction) {
+                var actorData = {
+                    "x": drop.x,
+                    "y": drop.y,
+                    "name": drop.getDataAsString("name"),
+                    "id": drop.getDataAsString("id"),
+                    "type": drop.getDataAsString("type"),
+                    "form": drop.getDataAsString("form"),
+                    "Drag.supportedActions": Qt.MoveAction,
+                    "Drag.dragType": Drag.Internal
+                }
+                var actorItem = Qt.createComponent(drop.getDataAsString(
+                                                       "form")).createObject(
+                            destArea, actorData)
+                followItem.active = false
+            } else if (drop.supportedActions == Qt.MoveAction) {
+                console.log("move action, drop.source - ", drop.source,
+                            " drop.source.source - ", drop.source.source)
             }
+            drop.acceptProposedAction()
+            drop.accepted = true
+        }
+        Loader {
+            active: false
+            id: followItem
+            opacity: 0.4
         }
     }
 }

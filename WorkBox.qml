@@ -107,6 +107,17 @@ Page {
             x: 5
             width: actorSetView.cellWidth
             height: actorSetView.cellHeight
+
+            Drag.active: mouseArea.drag.active
+            Drag.supportedActions: Qt.CopyAction
+            Drag.dragType: Drag.Automatic
+            Drag.mimeData: {
+                "id": id,
+                "name": name,
+                "type": type,
+                "form": form
+            }
+
             Row {
                 id: row1
                 spacing: 10
@@ -122,7 +133,8 @@ Page {
                 }
             }
             MouseArea {
-                drag.target: row1
+                id: mouseArea
+                drag.target: itemRoot
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onClicked: {
@@ -130,6 +142,12 @@ Page {
                         itemMenu.popup(itemRoot, mouse.x, mouse.y)
                     }
                     actorSetView.currentIndex = index
+                }
+                onReleased: {
+                    if (parent.Drag.supportedActions == Qt.CopyAction) {
+                        itemRoot.x = 0
+                        itemRoot.y = 0
+                    }
                 }
             }
         }
@@ -310,9 +328,9 @@ Page {
                 "name": cmdNameField.text,
                 "cmd": cmdTextField.text,
                 "group": groupListBox.currentText,
-                "type": "cmd"
+                "type": "cmd",
+                "form": "CmdActor.qml"
             }
-
             actorModel.addActor(actor)
             actorListModel.append(actor)
         }

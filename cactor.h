@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QSettings>
 #include <QQmlListProperty>
+#include <QProcess>
 
 class CActor : public QObject
 {
@@ -17,6 +18,7 @@ class CActor : public QObject
     Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(QString group READ group WRITE setGroup NOTIFY groupChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(QString form READ form WRITE setForm NOTIFY formChanged)
 
 
 public:
@@ -68,17 +70,27 @@ public:
         emit nameChanged(name);
     }
 
+    QString form() { return mForm; }
+
+    void setForm(const QString &form)
+    {
+        this->mForm = form;
+        emit formChanged(mForm);
+    }
+
 private:
     QString mId;
     QString mType;
     QString mGroup;
     QString mName;
+    QString mForm;
 
 signals:
     void idChanged(QString id);
     void typeChanged(QString type);
     void groupChanged(QString group);
     void nameChanged(QString name);
+    void formChanged(QString form);
 };
 
 class CActorGroup : public QObject
@@ -158,8 +170,12 @@ public:
 
 private:
     QString mCmd;
+    QProcess *process;
+
 
 public slots:
+    void start();
+    void stop();
     void send(const QString &msg);
 signals:
     void cmdChanged(QString cmd);

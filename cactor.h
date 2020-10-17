@@ -19,6 +19,7 @@ class CActor : public QObject
     Q_PROPERTY(QString group READ group WRITE setGroup NOTIFY groupChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString form READ form WRITE setForm NOTIFY formChanged)
+    Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged)
 
 
 public:
@@ -78,12 +79,21 @@ public:
         emit formChanged(mForm);
     }
 
+    QString description() { return mDesc; }
+
+    void setDescription(const QString &desc)
+    {
+        this->mDesc = desc;
+        emit descriptionChanged(mDesc);
+    }
+
 private:
     QString mId;
     QString mType;
     QString mGroup;
     QString mName;
     QString mForm;
+    QString mDesc;
 
 signals:
     void idChanged(QString id);
@@ -91,6 +101,7 @@ signals:
     void groupChanged(QString group);
     void nameChanged(QString name);
     void formChanged(QString form);
+    void descriptionChanged(QString desc);
 };
 
 class CActorGroup : public QObject

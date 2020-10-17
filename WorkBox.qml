@@ -94,7 +94,7 @@ Page {
         onClicked: contextMenu.popup(mouse.x, mouse.y)
     }
 
-    GridView {
+    ListView {
         id: actorSetView
         anchors.fill: parent
         anchors.margins: 8
@@ -104,10 +104,10 @@ Page {
         }
         delegate: Item {
             id: itemRoot
-            x: 5
-            width: actorSetView.cellWidth
-            height: actorSetView.cellHeight
-
+            anchors.margins: 5
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 50
             Drag.active: mouseArea.drag.active
             Drag.supportedActions: Qt.CopyAction
             Drag.dragType: Drag.Automatic
@@ -121,33 +121,47 @@ Page {
             Row {
                 id: row1
                 spacing: 10
-                Rectangle {
-                    width: 40
-                    height: 40
-                }
 
                 Text {
                     text: name
                     anchors.verticalCenter: parent.verticalCenter
                     font.bold: true
+                    color: "white"
                 }
             }
             MouseArea {
+                property int prevX: 0
+                property int prevY: 0
+
+                hoverEnabled: true
                 id: mouseArea
                 drag.target: itemRoot
-                anchors.fill: parent
+                drag.threshold: 5
+                anchors.fill: itemRoot
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onPressed: {
+                    prevX = itemRoot.x
+                    prevY = itemRoot.y
+                }
+
                 onClicked: {
                     if (mouse.button == Qt.RightButton) {
                         itemMenu.popup(itemRoot, mouse.x, mouse.y)
                     }
                     actorSetView.currentIndex = index
+                    mouse.accepted = true
                 }
                 onReleased: {
-                    if (parent.Drag.supportedActions == Qt.CopyAction) {
-                        itemRoot.x = 0
-                        itemRoot.y = 0
+                    if (parent.Drag.supportedActions === Qt.CopyAction) {
+                        itemRoot.x = prevX
+                        itemRoot.y = prevY
                     }
+                }
+                onHoveredChanged: {
+                    console.log("hovered", hovered)
+                    tip.parent = mouseArea
+                    tip.visible = hovered && description != undefined
+                    tip.text = description == undefined ? "" : description
                 }
             }
         }
@@ -155,7 +169,7 @@ Page {
         highlight: Rectangle {
             border.color: "lightsteelblue"
             border.width: 2
-            //            width: listView.width
+
             color: "transparent"
             radius: 5
             Behavior on y {
@@ -165,6 +179,11 @@ Page {
                 }
             }
         }
+    }
+
+    ToolTip {
+        id: tip
+        visible: false
     }
 
     Action {
@@ -320,6 +339,14 @@ Page {
                 Layout.fillWidth: true
                 selectByMouse: true
             }
+            Label {
+                text: "Description:"
+            }
+            TextField {
+                id: cmdDescField
+                Layout.fillWidth: true
+                selectByMouse: true
+            }
         }
 
         onAccepted: {
@@ -328,6 +355,7 @@ Page {
                 "name": cmdNameField.text,
                 "cmd": cmdTextField.text,
                 "group": groupListBox.currentText,
+                "description": cmdDescField.text,
                 "type": "cmd",
                 "form": "CmdActor.qml"
             }

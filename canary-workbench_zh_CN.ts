@@ -17,22 +17,22 @@
 <context>
     <name>WorkBox</name>
     <message>
-        <location filename="WorkBox.qml" line="202"/>
+        <location filename="WorkBox.qml" line="198"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="213"/>
+        <location filename="WorkBox.qml" line="209"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="219"/>
+        <location filename="WorkBox.qml" line="215"/>
         <source>Clear All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="260"/>
+        <location filename="WorkBox.qml" line="256"/>
         <source>Add...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -40,72 +40,72 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="main.qml" line="11"/>
+        <location filename="main.qml" line="12"/>
         <source>Stack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="23"/>
+        <location filename="main.qml" line="24"/>
         <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="25"/>
+        <location filename="main.qml" line="26"/>
         <source>&amp;New...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="28"/>
+        <location filename="main.qml" line="29"/>
         <source>&amp;Open...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="31"/>
+        <location filename="main.qml" line="32"/>
         <source>&amp;Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="34"/>
+        <location filename="main.qml" line="35"/>
         <source>Save &amp;As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="38"/>
+        <location filename="main.qml" line="39"/>
         <source>&amp;Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="42"/>
+        <location filename="main.qml" line="43"/>
         <source>&amp;Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="44"/>
+        <location filename="main.qml" line="45"/>
         <source>Cu&amp;t</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="47"/>
+        <location filename="main.qml" line="48"/>
         <source>&amp;Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="50"/>
+        <location filename="main.qml" line="51"/>
         <source>&amp;Paste</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="54"/>
+        <location filename="main.qml" line="55"/>
         <source>&amp;Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="56"/>
+        <location filename="main.qml" line="57"/>
         <source>&amp;About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="74"/>
+        <location filename="main.qml" line="75"/>
         <source>title</source>
         <translation type="unfinished"></translation>
     </message>

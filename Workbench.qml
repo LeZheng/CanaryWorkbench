@@ -8,7 +8,7 @@ Pane {
     id: root
 
     property string colorKey
-    property int index: 0
+    property string name
 
     width: 400
     height: 400

@@ -118,16 +118,11 @@ Page {
                 "form": form
             }
 
-            Row {
-                id: row1
-                spacing: 10
-
-                Text {
-                    text: name
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.bold: true
-                    color: "white"
-                }
+            Text {
+                text: name
+                anchors.verticalCenter: parent.verticalCenter
+                font.bold: true
+                color: "white"
             }
             MouseArea {
                 property int prevX: 0
@@ -158,7 +153,6 @@ Page {
                     }
                 }
                 onHoveredChanged: {
-                    console.log("hovered", hovered)
                     tip.parent = mouseArea
                     tip.visible = hovered && description != undefined
                     tip.text = description == undefined ? "" : description
@@ -183,7 +177,9 @@ Page {
 
     ToolTip {
         id: tip
+        delay: 500
         visible: false
+        timeout: 1000
     }
 
     Action {

@@ -8,6 +8,8 @@ Frame {
     width: 400
     height: 400
 
+    signal workbenchOpenRequested(string name)
+
     property var currentItem: null
     property alias currentIndex: listView.currentIndex
     property alias count: spaceListModel.count
@@ -28,19 +30,16 @@ Frame {
             id: spaceListModel
         }
         delegate: Item {
+            id: itemRoot
             x: 5
             width: parent.width
             height: 40
-            Row {
-                id: row1
-                spacing: 10
 
-                Text {
-                    text: name
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.bold: true
-                    color: "white"
-                }
+            Text {
+                text: name
+                anchors.verticalCenter: parent.verticalCenter
+                font.bold: true
+                color: "white"
             }
             MouseArea {
                 anchors.fill: parent
@@ -48,20 +47,21 @@ Frame {
                 onClicked: {
                     if (mouse.button == Qt.RightButton) {
                         itemMenu.spaceIndex = index
-                        itemMenu.popup(row1)
+                        itemMenu.popup(itemRoot)
                     } else {
                         listView.currentIndex = index
                         currentItem = spaceListModel.get(index)
                     }
                     mouse.accepted = true
                 }
+
+                onDoubleClicked: root.workbenchOpenRequested(name)
             }
         }
 
         highlight: Rectangle {
             border.color: "lightsteelblue"
             border.width: 2
-            //            width: listView.width
             color: "transparent"
             radius: 5
             Behavior on y {
@@ -71,7 +71,6 @@ Frame {
                 }
             }
         }
-        //        highlightFollowsCurrentItem: false
         footer: Button {
             id: addButton
             text: "add new"

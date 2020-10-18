@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.14
 import QtQuick.Controls.Material 2.12
 import QtGraphicalEffects 1.12
+import QtQuick.Layouts 1.12
 
 ApplicationWindow {
     id: window
@@ -92,35 +93,56 @@ ApplicationWindow {
 
         TaskListForm {
             id: spaceListForm
-            currentIndex: workbenchPages.currentIndex
+            //            currentIndex: workbenchPages.currentIndex
             SplitView.preferredWidth: window.width * 0.2
+
+            onWorkbenchOpenRequested: {
+                var tab = tabComponent.createObject(workbenchTabs, {
+                                                        "text": name
+                                                    })
+                var workbench = workbenchComponent.createObject(
+                            workbenchLayouts, {
+                                "name": name
+                            })
+            }
         }
 
-        SwipeView {
-            id: workbenchPages
-            orientation: Qt.Vertical
+        ColumnLayout {
+            clip: true
             SplitView.fillWidth: true
-            currentIndex: spaceListForm.currentIndex
-            Repeater {
-                model: spaceListForm.count
-                Loader {
-                    asynchronous: true
-                    active: SwipeView.isCurrentItem || SwipeView.isNextItem
-                            || SwipeView.isPreviousItem
-                    sourceComponent: Workbench {
-                        id: workbench
-                        index: index
-                    }
 
-                    onLoaded: {
-                        console.log("loaded:" + index)
-                    }
-                }
+            TabBar {
+                id: workbenchTabs
+                Layout.fillWidth: true
+            }
+
+            StackLayout {
+                id: workbenchLayouts
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                currentIndex: workbenchTabs.currentIndex
             }
         }
 
         WorkBox {
             SplitView.preferredWidth: window.width * 0.2
+        }
+    }
+
+    Component {
+        id: workbenchComponent
+
+        Workbench {
+            id: workbench
+        }
+    }
+
+    Component {
+        id: tabComponent
+
+        TabButton {
+            id: tab
+            width: 200
         }
     }
 }

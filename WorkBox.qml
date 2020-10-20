@@ -97,7 +97,8 @@ Page {
     ListView {
         id: actorSetView
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.margins: 4
+        spacing: 5
         focus: true
         model: ListModel {
             id: actorListModel
@@ -117,18 +118,48 @@ Page {
                 "type": type,
                 "form": form
             }
-
-            Text {
-                text: name
-                anchors.verticalCenter: parent.verticalCenter
-                font.bold: true
-                color: "white"
+            Glow {
+                anchors.fill: itemFrame
+                radius: 8
+                samples: 17
+                color: "#99505050"
+                source: bgRect
+                opacity: itemFrame.hovered ? 1 : 0
             }
+            Frame {
+                id: itemFrame
+                anchors.fill: parent
+                anchors.margins: 2
+                hoverEnabled: true
+
+                background: Rectangle {
+                    id: bgRect
+                    border.width: 1
+                    border.color: "gray"
+
+                    radius: 3
+                    color: itemFrame.hovered ? "#99505050" : "transparent"
+
+                    Behavior on color {
+
+                        ColorAnimation {
+                            duration: 200
+                        }
+                    }
+                }
+
+                Text {
+                    text: name
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.bold: true
+                    color: "white"
+                }
+            }
+
             MouseArea {
                 property int prevX: 0
                 property int prevY: 0
 
-                hoverEnabled: true
                 id: mouseArea
                 drag.target: itemRoot
                 drag.threshold: 5
@@ -151,25 +182,6 @@ Page {
                         itemRoot.x = prevX
                         itemRoot.y = prevY
                     }
-                }
-                onHoveredChanged: {
-                    tip.parent = mouseArea
-                    tip.visible = hovered && description != undefined
-                    tip.text = description == undefined ? "" : description
-                }
-            }
-        }
-
-        highlight: Rectangle {
-            border.color: "lightsteelblue"
-            border.width: 2
-
-            color: "transparent"
-            radius: 5
-            Behavior on y {
-                SpringAnimation {
-                    spring: 3
-                    damping: 0.2
                 }
             }
         }

@@ -46,9 +46,7 @@ Pane {
                     "Drag.supportedActions": Qt.MoveAction,
                     "Drag.dragType": Drag.Internal
                 }
-                var actorItem = Qt.createComponent(drop.getDataAsString(
-                                                       "form")).createObject(
-                            destArea, actorData)
+                actorComponent.createObject(destArea, actorData)
                 followItem.active = false
             } else if (drop.supportedActions == Qt.MoveAction) {
                 console.log("move action, drop.source - ", drop.source,
@@ -62,5 +60,11 @@ Pane {
             id: followItem
             opacity: 0.4
         }
+    }
+
+    Component {
+        id: actorComponent
+
+        ActorForm {}
     }
 }

@@ -17,22 +17,22 @@
 <context>
     <name>WorkBox</name>
     <message>
-        <location filename="WorkBox.qml" line="210"/>
+        <location filename="WorkBox.qml" line="215"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="221"/>
+        <location filename="WorkBox.qml" line="226"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="227"/>
+        <location filename="WorkBox.qml" line="232"/>
         <source>Clear All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="268"/>
+        <location filename="WorkBox.qml" line="273"/>
         <source>Add...</source>
         <translation type="unfinished"></translation>
     </message>

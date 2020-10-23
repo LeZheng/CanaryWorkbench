@@ -55,6 +55,13 @@ Frame {
                     mouse.accepted = true
                 }
 
+                onPressAndHold: {
+                    if (mouse.button == Qt.LeftButton) {
+                        itemMenu.spaceIndex = index
+                        itemMenu.popup(itemRoot)
+                    }
+                }
+
                 onDoubleClicked: root.workbenchOpenRequested(name)
             }
         }

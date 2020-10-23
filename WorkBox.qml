@@ -92,6 +92,7 @@ Page {
         anchors.fill: actorSetView
         acceptedButtons: Qt.RightButton
         onClicked: contextMenu.popup(mouse.x, mouse.y)
+        //        onPressAndHold: contextMenu.popup(mouse.x, mouse.y)TODO
     }
 
     ListView {
@@ -141,7 +142,6 @@ Page {
                     color: itemFrame.hovered ? "#99505050" : "transparent"
 
                     Behavior on color {
-
                         ColorAnimation {
                             duration: 200
                         }
@@ -181,6 +181,11 @@ Page {
                     if (parent.Drag.supportedActions === Qt.CopyAction) {
                         itemRoot.x = prevX
                         itemRoot.y = prevY
+                    }
+                }
+                onPressAndHold: {
+                    if (mouse.button == Qt.LeftButton) {
+                        itemMenu.popup(itemRoot, mouse.x, mouse.y)
                     }
                 }
             }

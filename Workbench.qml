@@ -12,6 +12,7 @@ Pane {
 
     width: 400
     height: 400
+
     background: FastBlur {
         opacity: 0.7
         radius: 25

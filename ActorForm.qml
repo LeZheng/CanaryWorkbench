@@ -25,9 +25,9 @@ Item {
         "form": form
     }
 
-    FastBlur {
+    Pane {
         anchors.fill: formRoot
-        radius: 32
+        visible: formRoot.entered
     }
 
     MouseArea {
@@ -107,76 +107,57 @@ Item {
     }
 
     Rectangle {
+        id: rect1
         border.width: 1
-        border.color: "white"
-        width: 5
+        border.color: "red"
+        width: parent.width
         height: 5
+        z: 3
         visible: formRoot.entered
-        anchors.left: parent.left
-        anchors.top: parent.top
-    }
-    Rectangle {
-        border.width: 1
-        border.color: "white"
-        width: 5
-        height: 5
-        visible: formRoot.entered
-        anchors.left: parent.left
         anchors.bottom: parent.bottom
-    }
-    Rectangle {
-        border.width: 1
-        border.color: "white"
-        width: 5
-        height: 5
-        visible: formRoot.entered
-        anchors.right: parent.right
-        anchors.top: parent.top
-    }
-    Rectangle {
-        border.width: 1
-        border.color: "white"
-        width: 5
-        height: 5
-        visible: formRoot.entered
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+
+        Drag.active: m1.drag.active
+        Drag.supportedActions: Qt.LinkAction
+        Drag.dragType: Drag.Automatic
+        Drag.mimeData: {
+            "id": id
+        }
+
+        MouseArea {
+            id: m1
+            z: 3
+            hoverEnabled: true
+            anchors.fill: parent
+            drag.target: rect1
+        }
     }
 
-    Rectangle {
-        border.width: 1
-        border.color: "white"
-        width: 5
-        height: 5
-        visible: formRoot.entered
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-    }
-    Rectangle {
-        border.width: 1
-        border.color: "white"
-        width: 5
-        height: 5
-        visible: formRoot.entered
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-    }
-    Rectangle {
-        border.width: 1
-        border.color: "white"
-        width: 5
-        height: 5
-        visible: formRoot.entered
-        anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
-    }
-    Rectangle {
-        border.width: 1
-        border.color: "white"
-        width: 5
-        height: 5
-        visible: formRoot.entered
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
+    DropArea {
+        id: destArea
+        anchors.fill: parent
+
+        onEntered: {
+            console.log("actor enter:", drag.source.x, drag.source.y)
+            if (drag.supportedActions == Qt.LinkAction) {
+
+                drag.accepted = true
+            }
+        }
+
+        onPositionChanged: {
+            if (drag.supportedActions == Qt.LinkAction) {
+                console.log("actor move", drag.x, drag.y)
+                drag.accepted = true
+            }
+        }
+
+        onDropped: {
+            console.log("actor drop")
+            if (drop.supportedActions == Qt.LinkAction) {
+
+                drop.acceptProposedAction()
+                drop.accepted = true
+            }
+        }
     }
 }

@@ -30,6 +30,16 @@ QQmlListProperty<Pipe> Workspace::pipeList()
                                   &Workspace::clearPipes);
 }
 
+QQmlListProperty<ActorDevice> Workspace::actorList()
+{
+    return QQmlListProperty<ActorDevice>(this,
+                                  this,
+                                  &Workspace::appendActor,
+                                  &Workspace::actorCount,
+                                  &Workspace::actorAt,
+                                  &Workspace::clearActors);
+}
+
 void Workspace::appendPipe(Pipe *pipe)
 {
     mPipeList.append(pipe);
@@ -50,6 +60,26 @@ void Workspace::clearPipes()
     mPipeList.clear();
 }
 
+void Workspace::appendActor(ActorDevice *actor)
+{
+    mActorList.append(actor);
+}
+
+int Workspace::actorCount() const
+{
+    return mActorList.count();
+}
+
+ActorDevice *Workspace::actorAt(int idx) const
+{
+    return mActorList.at(idx);
+}
+
+void Workspace::clearActors()
+{
+    mActorList.clear();
+}
+
 void Workspace::appendPipe(QQmlListProperty<Pipe> *list, Pipe *pipe)
 {
     reinterpret_cast<Workspace *>(list->data)->appendPipe(pipe);
@@ -68,6 +98,26 @@ Pipe *Workspace::pipeAt(QQmlListProperty<Pipe> *list, int idx)
 void Workspace::clearPipes(QQmlListProperty<Pipe> *list)
 {
     reinterpret_cast<Workspace *>(list->data)->clearPipes();
+}
+
+void Workspace::appendActor(QQmlListProperty<ActorDevice> *list, ActorDevice *actor)
+{
+    reinterpret_cast<Workspace *>(list->data)->appendActor(actor);
+}
+
+int Workspace::actorCount(QQmlListProperty<ActorDevice> *list)
+{
+    return reinterpret_cast<Workspace *>(list->data)->actorCount();
+}
+
+ActorDevice *Workspace::actorAt(QQmlListProperty<ActorDevice> *list, int idx)
+{
+    return reinterpret_cast<Workspace *>(list->data)->actorAt(idx);
+}
+
+void Workspace::clearActors(QQmlListProperty<ActorDevice> *list)
+{
+    return reinterpret_cast<Workspace *>(list->data)->clearActors();
 }
 
 WorkspaceModel::WorkspaceModel(QObject *parent):QObject(parent)

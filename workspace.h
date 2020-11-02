@@ -87,6 +87,7 @@ class Workspace:public QObject
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QQmlListProperty<Pipe> pipeList READ pipeList)
+    Q_PROPERTY(QQmlListProperty<ActorDevice> actorList READ actorList)
 public:
     Workspace(QObject *parent = nullptr);
 
@@ -102,19 +103,32 @@ public:
     }
     QQmlListProperty<Pipe> pipeList();
 
+    QQmlListProperty<ActorDevice> actorList();
+
     void appendPipe(Pipe *pipe);
     int pipeCount() const;
     Pipe *pipeAt(int idx) const;
     void clearPipes();
 
+    void appendActor(ActorDevice *actor);
+    int actorCount() const;
+    ActorDevice *actorAt(int idx) const;
+    void clearActors();
+
 private:
     QString mName;
     QList<Pipe *> mPipeList;
+    QList<ActorDevice *> mActorList;
 
     static void appendPipe(QQmlListProperty<Pipe> *, Pipe *pipe);
     static int pipeCount(QQmlListProperty<Pipe> *);
     static Pipe *pipeAt(QQmlListProperty<Pipe> *,int idx);
     static void clearPipes(QQmlListProperty<Pipe> *);
+
+    static void appendActor(QQmlListProperty<ActorDevice> *, ActorDevice *actor);
+    static int actorCount(QQmlListProperty<ActorDevice> *);
+    static ActorDevice *actorAt(QQmlListProperty<ActorDevice> *,int idx);
+    static void clearActors(QQmlListProperty<ActorDevice> *);
 signals:
     void nameChanged(QString name);
 };

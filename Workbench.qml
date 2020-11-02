@@ -112,6 +112,10 @@ Pane {
     Component {
         id: actorComponent
 
-        ActorForm {}
+        ActorForm {
+            onDragMoved: {
+                movingShape.endPoint = p
+            }
+        }
     }
 }

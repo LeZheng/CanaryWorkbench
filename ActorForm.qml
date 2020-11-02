@@ -8,6 +8,8 @@ Item {
     height: 100
     width: 100
 
+    signal dragMoved(point p)
+
     property string form
     property string name
     property string id
@@ -41,7 +43,6 @@ Item {
 
         onExited: formRoot.entered = false
     }
-
     Frame {
         id: formFrame
         anchors {
@@ -137,17 +138,20 @@ Item {
         anchors.fill: parent
 
         onEntered: {
-            console.log("actor enter:", drag.source.x, drag.source.y)
+            console.log("actor enter:", drag.source)
             if (drag.supportedActions == Qt.LinkAction) {
-
-                drag.accepted = true
+                formRoot.entered = true
+                //                drag.accepted = true
             }
         }
 
+        onExited: formRoot.entered = false
+
         onPositionChanged: {
             if (drag.supportedActions == Qt.LinkAction) {
-                console.log("actor move", drag.x, drag.y)
+                var p = destArea.mapToItem(formRoot.parent, drag.x, drag.y)
                 drag.accepted = true
+                formRoot.dragMoved(p)
             }
         }
 

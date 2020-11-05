@@ -3,7 +3,7 @@
         <file>main.qml</file>
         <file>HomeForm.ui.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>Workbench.qml</file>
+        <file>WorkspaceForm.qml</file>
         <file>SystemMenu.qml</file>
         <file>WorkBox.qml</file>
         <file>TaskListForm.qml</file>

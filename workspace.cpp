@@ -2,22 +2,23 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMetaMethod>
+#include <QDebug>
 
-Workspace::Workspace(QObject *parent):QObject(parent)
+Workspace::Workspace(const QString &name,QObject *parent):QObject(parent),mName(name)
 {
-
+    this->mSetting = new QSettings(mName, QSettings::IniFormat, this);
 }
 
 Workspace* Workspace::fromJson(const QString &jsonStr)
 {
-    auto w = new Workspace();
     auto jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
     if(jsonDoc.isObject()) {
         auto jsonObj = jsonDoc.object();
-        w->setName(jsonObj.value("name").toString());
+        auto w = new Workspace(jsonObj.value("name").toString());
         //TODO other property
+        return w;
     }
-    return w;
+    return nullptr;
 }
 
 QQmlListProperty<Pipe> Workspace::pipeList()
@@ -30,9 +31,9 @@ QQmlListProperty<Pipe> Workspace::pipeList()
                                   &Workspace::clearPipes);
 }
 
-QQmlListProperty<ActorDevice> Workspace::actorList()
+QQmlListProperty<ActorItem> Workspace::actorList()
 {
-    return QQmlListProperty<ActorDevice>(this,
+    return QQmlListProperty<ActorItem>(this,
                                   this,
                                   &Workspace::appendActor,
                                   &Workspace::actorCount,
@@ -60,7 +61,7 @@ void Workspace::clearPipes()
     mPipeList.clear();
 }
 
-void Workspace::appendActor(ActorDevice *actor)
+void Workspace::appendActor(ActorItem *actor)
 {
     mActorList.append(actor);
 }
@@ -70,7 +71,7 @@ int Workspace::actorCount() const
     return mActorList.count();
 }
 
-ActorDevice *Workspace::actorAt(int idx) const
+ActorItem *Workspace::actorAt(int idx) const
 {
     return mActorList.at(idx);
 }
@@ -100,22 +101,22 @@ void Workspace::clearPipes(QQmlListProperty<Pipe> *list)
     reinterpret_cast<Workspace *>(list->data)->clearPipes();
 }
 
-void Workspace::appendActor(QQmlListProperty<ActorDevice> *list, ActorDevice *actor)
+void Workspace::appendActor(QQmlListProperty<ActorItem> *list, ActorItem *actor)
 {
     reinterpret_cast<Workspace *>(list->data)->appendActor(actor);
 }
 
-int Workspace::actorCount(QQmlListProperty<ActorDevice> *list)
+int Workspace::actorCount(QQmlListProperty<ActorItem> *list)
 {
     return reinterpret_cast<Workspace *>(list->data)->actorCount();
 }
 
-ActorDevice *Workspace::actorAt(QQmlListProperty<ActorDevice> *list, int idx)
+ActorItem *Workspace::actorAt(QQmlListProperty<ActorItem> *list, int idx)
 {
     return reinterpret_cast<Workspace *>(list->data)->actorAt(idx);
 }
 
-void Workspace::clearActors(QQmlListProperty<ActorDevice> *list)
+void Workspace::clearActors(QQmlListProperty<ActorItem> *list)
 {
     return reinterpret_cast<Workspace *>(list->data)->clearActors();
 }
@@ -123,11 +124,22 @@ void Workspace::clearActors(QQmlListProperty<ActorDevice> *list)
 WorkspaceModel::WorkspaceModel(QObject *parent):QObject(parent)
 {
     this->settings = new QSettings("Workspace Settings", QSettings::IniFormat, this);
+    auto spaceArray = settings->value("space-list").toJsonArray();
+    foreach (auto space, spaceArray) {
+        auto w = new Workspace(space.toObject().value("name").toString() ,this);
+        workspaceList.append(w);
+    }
+    qDebug() << "init:" << workspaceList.length();
 }
 
 QJsonArray WorkspaceModel::listJson()
 {
     return settings->value("space-list").toJsonArray();
+}
+
+QQmlListProperty<Workspace> WorkspaceModel::list()
+{
+    return QQmlListProperty<Workspace>(this, workspaceList);
 }
 
 void WorkspaceModel::addJson(QJsonValue json)
@@ -144,14 +156,24 @@ void WorkspaceModel::remove(int index)
     settings->setValue("space-list", array);
 }
 
+Workspace *WorkspaceModel::get(const QString &name)
+{
+    foreach (auto w, workspaceList) {
+        if(w->name() == name){
+            return w;
+        }
+    }
+    return nullptr;
+}
+
 Pipe::Pipe(QObject *parent):QObject(parent)
 {
 
 }
 
-ActorDevice::ActorDevice(QObject *parent) : QObject(parent) {}
+ActorItem::ActorItem(QObject *parent) : QObject(parent) {}
 
-QStringList ActorDevice::getSlots()
+QStringList ActorItem::getSlots()
 {
     QList<QString> slotList;
     CActor *actor = nullptr; //TODO get from ActorModel;
@@ -167,7 +189,7 @@ QStringList ActorDevice::getSlots()
     return slotList;
 }
 
-QStringList ActorDevice::getSignals()
+QStringList ActorItem::getSignals()
 {
     QList<QString> signalList;
     CActor *actor = nullptr; //TODO get from ActorModel;

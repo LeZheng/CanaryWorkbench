@@ -132,7 +132,7 @@ ApplicationWindow {
     Component {
         id: workbenchComponent
 
-        Workbench {
+        WorkspaceForm {
             id: workbench
         }
     }

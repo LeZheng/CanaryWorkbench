@@ -128,10 +128,20 @@ Pane {
         id: actorComponent
 
         ActorForm {
+            id: actorForm
             Drag.supportedActions: Qt.MoveAction
             Drag.dragType: Drag.Internal
             onDragMoved: {
                 movingShape.endPoint = p
+            }
+            onPipeDroped: {
+                var pipeJson = {
+                    "outputId": outputId,
+                    "inputId": inputId
+                }
+                var pipe = workspaceModel.addPipe(workspace, pipeJson)
+                console.log("add pipe:", pipe)
+                //TODO
             }
         }
     }

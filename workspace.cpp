@@ -172,7 +172,18 @@ ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
     foreach (auto key , json.keys()) {
         actor->setProperty(key.toStdString().data(), json.value(key));
     }
+    space->appendActor(actor);
     return actor;
+}
+
+Pipe *WorkspaceModel::addPipe(Workspace *space, QJsonObject json)
+{
+    auto pipe = new Pipe(space);
+    foreach (auto key, json.keys()) {
+        pipe->setProperty(key.toStdString().data(), json.value(key));
+    }
+    space->appendPipe(pipe);
+    return pipe;
 }
 
 Pipe::Pipe(QObject *parent):QObject(parent)

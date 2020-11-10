@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QQmlListProperty>
 #include "cactor.h"
+#include <QDebug>
 
 
 class Pipe : public QObject
@@ -192,6 +193,7 @@ public slots:
     Q_INVOKABLE void remove(int index);
     Q_INVOKABLE Workspace* get(const QString &name);
     Q_INVOKABLE ActorItem* addActor( Workspace *space,QJsonObject json);
+    Q_INVOKABLE Pipe *addPipe(Workspace *space, QJsonObject json);
 
 private:
     QSettings *settings;

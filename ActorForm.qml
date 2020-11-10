@@ -6,10 +6,8 @@ import ActorItem 1.0
 Item {
     id: formRoot
 
-    height: 100
-    width: 100
-
     signal dragMoved(point p)
+    signal pipeDroped(string inputId, string outputId)
 
     property ActorItem actorItem
 
@@ -19,6 +17,22 @@ Item {
     property string type
 
     property bool entered: false
+
+    height: 100
+    width: 100
+    x: actorItem.x
+    y: actorItem.y
+
+    Binding {
+        target: actorItem
+        property: "x"
+        value: formRoot.x
+    }
+    Binding {
+        target: actorItem
+        property: "y"
+        value: formRoot.y
+    }
 
     Drag.active: dragArea.drag.active
     Drag.supportedActions: Qt.MoveAction
@@ -124,7 +138,7 @@ Item {
         Drag.supportedActions: Qt.LinkAction
         Drag.dragType: Drag.Automatic
         Drag.mimeData: {
-            "id": id
+            "id": actorItem.id
         }
 
         MouseArea {
@@ -161,9 +175,9 @@ Item {
         onDropped: {
             console.log("actor drop")
             if (drop.supportedActions == Qt.LinkAction) {
-
                 drop.acceptProposedAction()
                 drop.accepted = true
+                formRoot.pipeDroped(drop.getDataAsString("id"), actorItem.id)
             }
         }
     }

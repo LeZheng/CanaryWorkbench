@@ -4,12 +4,15 @@ import QtQuick 2.4
 import QtQuick.Shapes 1.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
+import Workspace 1.0
+import ActorItem 1.0
 
 Pane {
     id: root
 
     property string colorKey
     property string name
+    property Workspace workspace
 
     width: 400
     height: 400
@@ -51,6 +54,19 @@ Pane {
 
         onDropped: {
             if (drop.supportedActions == Qt.CopyAction) {
+
+                var actor = workspaceModel.addActor(workspace, {
+                                                        "x": drop.x,
+                                                        "y": drop.y,
+                                                        "name": drop.getDataAsString(
+                                                                    "name"),
+                                                        "id": drop.getDataAsString(
+                                                                  "id"),
+                                                        "type": drop.getDataAsString(
+                                                                    "type"),
+                                                        "form": drop.getDataAsString(
+                                                                    "form")
+                                                    })
                 var actorData = {
                     "x": drop.x,
                     "y": drop.y,
@@ -58,8 +74,7 @@ Pane {
                     "id": drop.getDataAsString("id"),
                     "type": drop.getDataAsString("type"),
                     "form": drop.getDataAsString("form"),
-                    "Drag.supportedActions": Qt.MoveAction,
-                    "Drag.dragType": Drag.Internal
+                    "actorItem": actor
                 }
                 actorComponent.createObject(destArea, actorData)
                 followItem.active = false
@@ -113,9 +128,15 @@ Pane {
         id: actorComponent
 
         ActorForm {
+            Drag.supportedActions: Qt.MoveAction
+            Drag.dragType: Drag.Internal
             onDragMoved: {
                 movingShape.endPoint = p
             }
         }
+    }
+
+    Component.onCompleted: {
+        workspace = workspaceModel.get(name)
     }
 }

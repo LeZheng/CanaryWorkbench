@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.12
+import ActorItem 1.0
 
 Item {
     id: formRoot
@@ -9,6 +10,8 @@ Item {
     width: 100
 
     signal dragMoved(point p)
+
+    property ActorItem actorItem
 
     property string form
     property string name
@@ -99,7 +102,7 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("complete:", form)
+        console.log("complete:", name, form, actorItem)
         if (form.length > 0) {
             let actor = Qt.createComponent(form).createObject(formFrame)
         } else {

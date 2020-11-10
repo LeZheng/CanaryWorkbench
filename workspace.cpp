@@ -166,6 +166,15 @@ Workspace *WorkspaceModel::get(const QString &name)
     return nullptr;
 }
 
+ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
+{
+    auto actor = new ActorItem(space);
+    foreach (auto key , json.keys()) {
+        actor->setProperty(key.toStdString().data(), json.value(key));
+    }
+    return actor;
+}
+
 Pipe::Pipe(QObject *parent):QObject(parent)
 {
 

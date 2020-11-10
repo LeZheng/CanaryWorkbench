@@ -191,6 +191,7 @@ public slots:
     Q_INVOKABLE void addJson(QJsonValue json);
     Q_INVOKABLE void remove(int index);
     Q_INVOKABLE Workspace* get(const QString &name);
+    Q_INVOKABLE ActorItem* addActor( Workspace *space,QJsonObject json);
 
 private:
     QSettings *settings;

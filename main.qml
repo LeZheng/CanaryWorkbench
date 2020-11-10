@@ -91,7 +91,7 @@ ApplicationWindow {
         anchors.fill: parent
         orientation: Qt.Horizontal
 
-        TaskListForm {
+        SpaceListForm {
             id: spaceListForm
             //            currentIndex: workbenchPages.currentIndex
             SplitView.preferredWidth: window.width * 0.2

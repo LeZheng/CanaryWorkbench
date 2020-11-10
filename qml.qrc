@@ -6,7 +6,7 @@
         <file>WorkspaceForm.qml</file>
         <file>SystemMenu.qml</file>
         <file>WorkBox.qml</file>
-        <file>TaskListForm.qml</file>
+        <file>SpaceListForm.qml</file>
         <file>CmdActor.qml</file>
         <file>ActorForm.qml</file>
         <file>PipeForm.qml</file>

@@ -13,6 +13,7 @@ Pane {
     property string colorKey
     property string name
     property Workspace workspace
+    property var actorFormMap: Object()
 
     width: 400
     height: 400
@@ -30,6 +31,7 @@ Pane {
         onEntered: {
             console.log("enter:", drag.source.x, drag.source.y)
             if (drag.supportedActions == Qt.LinkAction) {
+                movingShape.visible = true
                 var p = drag.source.mapToItem(destArea, 0, 0)
                 console.log("start", p)
                 movingShape.startPoint = p //Qt.point(drag.source.x, drag.source.y)
@@ -43,7 +45,6 @@ Pane {
         onPositionChanged: {
             if (drag.supportedActions == Qt.LinkAction) {
                 var p = destArea.mapToGlobal(drag.x, drag.y)
-                console.log("move", drag.x, drag.y, p)
                 movingShape.endPoint = Qt.point(drag.x, drag.y)
             } else {
                 drag.accepted = true
@@ -54,14 +55,16 @@ Pane {
 
         onDropped: {
             if (drop.supportedActions == Qt.CopyAction) {
-
+                let time = new Date().getUTCMilliseconds()
                 var actor = workspaceModel.addActor(workspace, {
                                                         "x": drop.x,
                                                         "y": drop.y,
                                                         "name": drop.getDataAsString(
                                                                     "name"),
                                                         "id": drop.getDataAsString(
-                                                                  "id"),
+                                                                  "name") + time,
+                                                        "actor": drop.getDataAsString(
+                                                                     "id"),
                                                         "type": drop.getDataAsString(
                                                                     "type"),
                                                         "form": drop.getDataAsString(
@@ -71,12 +74,16 @@ Pane {
                     "x": drop.x,
                     "y": drop.y,
                     "name": drop.getDataAsString("name"),
-                    "id": drop.getDataAsString("id"),
+                    "id": actor.id,
                     "type": drop.getDataAsString("type"),
                     "form": drop.getDataAsString("form"),
                     "actorItem": actor
                 }
-                actorComponent.createObject(destArea, actorData)
+                var form = actorComponent.createObject(destArea, actorData)
+                root.actorFormMap[actor.id] = form
+                form.Component.onDestruction.connect(function () {
+                    root.actorFormMap[actor.id] = null //TODO delete key
+                })
                 followItem.active = false
                 drop.acceptProposedAction()
                 drop.accepted = true
@@ -84,6 +91,7 @@ Pane {
                 console.log("move action, drop.source - ", drop.source,
                             " drop.source.source - ", drop.source.source)
             } else if (drop.supportedActions == Qt.LinkAction) {
+                movingShape.visible = false
                 console.log("link action, drop.source - ", drop.source,
                             " drop.source.source - ", drop.source.source)
             }
@@ -135,14 +143,27 @@ Pane {
                 movingShape.endPoint = p
             }
             onPipeDroped: {
+                movingShape.visible = false
                 var pipeJson = {
                     "outputId": outputId,
                     "inputId": inputId
                 }
                 var pipe = workspaceModel.addPipe(workspace, pipeJson)
-                console.log("add pipe:", pipe)
+                console.log("add pipe:", pipe, outputId, inputId)
+                pipeComponent.createObject(destArea, {
+                                               "pipe": pipe,
+                                               "sourceForm": root.actorFormMap[inputId],
+                                               "targetForm": root.actorFormMap[outputId]
+                                           })
                 //TODO
             }
+        }
+    }
+
+    Component {
+        id: pipeComponent
+        PipeForm {
+            id: pipeForm
         }
     }
 

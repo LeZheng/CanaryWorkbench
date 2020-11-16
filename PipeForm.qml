@@ -71,6 +71,26 @@ Item {
                 y: endPoint.y
             }
         }
+
+        MouseArea {
+            anchors.fill: parent
+            onPressed: {
+                let x0 = mouse.x
+                let y0 = mouse.y
+                let a = endPoint.y - startPoint.y
+                let b = startPoint.x - endPoint.x
+                let c = endPoint.x * startPoint.y - startPoint.x * endPoint.y
+                let d = Math.abs(x0 * a + y0 * b + c) / Math.sqrt(a * a + b * b)
+                mouse.accepted = d < 6 && x0 >= Math.min(startPoint.x,
+                                                         endPoint.x)
+                        && x0 <= Math.max(startPoint.x, endPoint.x)
+            }
+
+            onClicked: {
+                console.log("clicked...")
+                //TODO
+            }
+        }
     }
 
     Component.onCompleted: {

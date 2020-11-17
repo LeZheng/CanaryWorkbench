@@ -116,7 +116,7 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("complete:", name, form, actorItem)
+        console.log("complete:", name, form, actorItem.actorId)
         if (form.length > 0) {
             let actor = Qt.createComponent(form).createObject(formFrame)
         } else {
@@ -138,7 +138,8 @@ Item {
         Drag.supportedActions: Qt.LinkAction
         Drag.dragType: Drag.Automatic
         Drag.mimeData: {
-            "id": actorItem.id
+            "id": actorItem.id,
+            "actorId": actorItem.actorId
         }
 
         MouseArea {
@@ -177,6 +178,13 @@ Item {
             if (drop.supportedActions == Qt.LinkAction) {
                 drop.acceptProposedAction()
                 drop.accepted = true
+                let sActor = actorModel.getActor(drop.getDataAsString(
+                                                     "actorId"))
+                let signalList = sActor.getSignals()
+                let tActor = actorModel.getActor(actorItem.actorId)
+                let slotList = tActor.getSlots()
+                //TODO create pipe
+                console.log("signals:", signalList, slotList)
                 formRoot.pipeDroped(drop.getDataAsString("id"), actorItem.id)
             }
         }

@@ -2,6 +2,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QVariant>
+#include <QMetaObject>
+#include <QMetaMethod>
 
 CActor::CActor(QObject *parent) : QObject(parent)
 {
@@ -24,6 +26,30 @@ CActor *CActor::create(const QString &json, QObject *parent)
     }
 
     return actor;
+}
+
+QStringList CActor::getSignals()
+{
+    QStringList signalList;
+    for(int i = 0;i < metaObject()->methodCount();i++){
+        auto method = metaObject()->method(i);
+        if(method.methodType() == QMetaMethod::Signal){
+            signalList.append(method.name());
+        }
+    }
+    return signalList;
+}
+
+QStringList CActor::getSlots()
+{
+    QStringList slotList;
+    for(int i = 0;i < metaObject()->methodCount();i++){
+        auto method = metaObject()->method(i);
+        if(method.methodType() == QMetaMethod::Slot){
+            slotList.append(method.name());
+        }
+    }
+    return slotList;
 }
 
 

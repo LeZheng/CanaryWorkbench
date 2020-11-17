@@ -63,8 +63,8 @@ Pane {
                                                                     "name"),
                                                         "id": drop.getDataAsString(
                                                                   "name") + time,
-                                                        "actor": drop.getDataAsString(
-                                                                     "id"),
+                                                        "actorId": drop.getDataAsString(
+                                                                       "id"),
                                                         "type": drop.getDataAsString(
                                                                     "type"),
                                                         "form": drop.getDataAsString(

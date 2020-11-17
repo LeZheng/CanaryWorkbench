@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<ActorItem>("ActorItem", 1, 0, "ActorItem");
     qmlRegisterType<Pipe>("Pipe", 1, 0, "Pipe");
+    qmlRegisterType<CActor>("CActor", 1, 0, "CActor");
 //    qmlRegisterType<Workspace>("Workspace", 1, 0, "Workspace");
     qmlRegisterUncreatableType<Workspace>("Workspace", 1,0,"Workspace",QLatin1String("Workspace are read-only"));
     qmlRegisterUncreatableType<WorkspaceModel>("WorkspaceModel", 1,0,"WorkspaceModel",QLatin1String("WorkspaceModel are read-only"));

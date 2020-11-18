@@ -15,6 +15,8 @@ class Pipe : public QObject
 
     Q_PROPERTY(QString inputId READ inputId WRITE setInputId NOTIFY inputIdChanged)
     Q_PROPERTY(QString outputId READ outputId WRITE setOutputId NOTIFY outputIdChanged)
+    Q_PROPERTY(QString signalName READ signalName WRITE setSignalName NOTIFY signalNameChanged)
+    Q_PROPERTY(QString slotName READ slotName WRITE setSlotName NOTIFY slotNameChanged)
 public:
     explicit Pipe(QObject *parent = nullptr);
 
@@ -36,14 +38,32 @@ public:
     {
         return mOutputId;
     }
+    void setSignalName(const QString &sName){
+        mSignalName = sName;
+        emit signalNameChanged(mSignalName);
+    }
+    QString signalName(){
+        return mSignalName;
+    }
+    void setSlotName(const QString &sName){
+        mSlotName = sName;
+        emit slotNameChanged(mSlotName);
+    }
+    QString slotName(){
+        return mSlotName;
+    }
 
 private:
     QString mInputId;
     QString mOutputId;
+    QString mSignalName;
+    QString mSlotName;
 
 signals:
     void inputIdChanged(QString inputId);
     void outputIdChanged(QString inputId);
+    void signalNameChanged(QString signalName);
+    void slotNameChanged(QString slotName);
 };
 
 class ActorItem : public QObject

@@ -1,13 +1,14 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.12
+import QtQuick.Layouts 1.12
 import ActorItem 1.0
 
 Item {
     id: formRoot
 
     signal dragMoved(point p)
-    signal pipeDroped(string inputId, string outputId)
+    signal pipeDropped(string inputId, string outputId, string signalName, string slotName)
 
     property ActorItem actorItem
 
@@ -178,14 +179,64 @@ Item {
             if (drop.supportedActions == Qt.LinkAction) {
                 drop.acceptProposedAction()
                 drop.accepted = true
+
                 let sActor = actorModel.getActor(drop.getDataAsString(
                                                      "actorId"))
                 let signalList = sActor.getSignals()
                 let tActor = actorModel.getActor(actorItem.actorId)
                 let slotList = tActor.getSlots()
-                //TODO create pipe
-                console.log("signals:", signalList, slotList)
-                formRoot.pipeDroped(drop.getDataAsString("id"), actorItem.id)
+
+                let dialog = pipeDialogComponent.createObject(formRoot, {
+                                                                  "sourceId": drop.getDataAsString(
+                                                                                  "id"),
+                                                                  "targetId": actorItem.id,
+                                                                  "sourceName": sActor.name,
+                                                                  "targetName": tActor.name,
+                                                                  "signalList": signalList,
+                                                                  "slotList": slotList
+                                                              })
+                dialog.open()
+            }
+        }
+    }
+
+    Component {
+        id: pipeDialogComponent
+        Dialog {
+            id: createPipeDialog
+            title: "Create Pipe"
+            property var sourceId
+            property var targetId
+            property var sourceName
+            property var targetName
+            property var signalList: []
+            property var slotList: []
+            GridLayout {
+                columns: 2
+
+                Label {
+                    text: createPipeDialog.sourceName
+                }
+                ComboBox {
+                    id: signalBox
+                    Layout.minimumWidth: 200
+                    model: createPipeDialog.signalList
+                }
+                Label {
+                    text: createPipeDialog.targetName
+                }
+                ComboBox {
+                    id: slotBox
+                    model: createPipeDialog.slotList
+                    Layout.minimumWidth: 200
+                }
+            }
+
+            standardButtons: Dialog.Ok | Dialog.Cancel
+
+            onAccepted: {
+                formRoot.pipeDropped(sourceId, targetId, signalBox.currentText,
+                                     slotBox.currentText)
             }
         }
     }

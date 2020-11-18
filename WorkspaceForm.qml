@@ -62,7 +62,7 @@ Pane {
                                                         "name": drop.getDataAsString(
                                                                     "name"),
                                                         "id": drop.getDataAsString(
-                                                                  "name") + time,
+                                                                  "id") + time,
                                                         "actorId": drop.getDataAsString(
                                                                        "id"),
                                                         "type": drop.getDataAsString(
@@ -142,14 +142,16 @@ Pane {
             onDragMoved: {
                 movingShape.endPoint = p
             }
-            onPipeDroped: {
+            onPipeDropped: {
                 movingShape.visible = false
                 var pipeJson = {
                     "outputId": outputId,
-                    "inputId": inputId
+                    "inputId": inputId,
+                    "signalName": signalName,
+                    "slotName": slotName
                 }
                 var pipe = workspaceModel.addPipe(workspace, pipeJson)
-                console.log("add pipe:", pipe, outputId, inputId)
+                console.log("add pipe:", pipe, JSON.stringify(pipeJson))
                 pipeComponent.createObject(destArea, {
                                                "pipe": pipe,
                                                "sourceForm": root.actorFormMap[inputId],

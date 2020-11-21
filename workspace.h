@@ -214,10 +214,12 @@ public slots:
     Q_INVOKABLE Workspace* get(const QString &name);
     Q_INVOKABLE ActorItem* addActor( Workspace *space,QJsonObject json);
     Q_INVOKABLE Pipe *addPipe(Workspace *space, QJsonObject json);
+    Q_INVOKABLE void save(const QJsonObject &json);
 
 private:
     QSettings *settings;
     QList<Workspace *> workspaceList;
+
 };
 
 #endif // WORKSPACE_H

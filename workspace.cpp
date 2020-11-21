@@ -127,9 +127,28 @@ WorkspaceModel::WorkspaceModel(QObject *parent):QObject(parent)
     auto spaceArray = settings->value("space-list").toJsonArray();
     foreach (auto space, spaceArray) {
         auto w = new Workspace(space.toObject().value("name").toString() ,this);
+        auto actorArray = space.toObject().value("actorList").toArray();
+        foreach (auto actorJson, actorArray) {
+            auto actor = new ActorItem(w);
+            auto json = actorJson.toObject();
+            foreach (auto key , json.keys()) {
+                actor->setProperty(key.toStdString().data(), json.value(key));
+            }
+            w->appendActor(actor);
+        }
+        auto pipeArray = space.toObject().value("pipeList").toArray();
+        foreach (auto pipeJson, pipeArray) {
+            auto pipe = new Pipe(w);
+            auto json = pipeJson.toObject();
+            foreach (auto key , json.keys()) {
+                pipe->setProperty(key.toStdString().data(), json.value(key));
+            }
+            w->appendPipe(pipe);
+        }
         workspaceList.append(w);
     }
-    qDebug() << "init:" << workspaceList.length();
+    QJsonDocument d(spaceArray);
+    qDebug() << "init:" << d.toJson();
 }
 
 QJsonArray WorkspaceModel::listJson()
@@ -184,6 +203,21 @@ Pipe *WorkspaceModel::addPipe(Workspace *space, QJsonObject json)
     }
     space->appendPipe(pipe);
     return pipe;
+}
+
+void WorkspaceModel::save(const QJsonObject &json)
+{
+    const QString &name = json.value("name").toString();
+    auto spaceArray = settings->value("space-list").toJsonArray();
+    for(int i = 0;i < spaceArray.size();i++){
+        auto spaceJson = spaceArray.at(i).toObject();
+        if(spaceJson.value("name").toString() == name){
+            spaceArray.replace(i, json);
+            break;
+        }
+    }
+    settings->setValue("space-list", spaceArray);
+    qDebug() << "save:" << QJsonDocument(spaceArray).toJson();
 }
 
 Pipe::Pipe(QObject *parent):QObject(parent)

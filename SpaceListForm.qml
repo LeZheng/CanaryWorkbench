@@ -123,6 +123,7 @@ Frame {
         Component.onCompleted: {
             itemMenu.addAction(removeAction)
             itemMenu.addAction(editAction)
+            itemMenu.addAction(saveAction)
         }
     }
 
@@ -130,6 +131,14 @@ Frame {
         id: contextMenu
         Component.onCompleted: {
             contextMenu.addAction(addAction)
+        }
+    }
+
+    Action {
+        id: saveAction
+        text: "Save"
+        onTriggered: {
+            workspaceModel.save(currentItem)
         }
     }
 

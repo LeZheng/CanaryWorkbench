@@ -152,7 +152,8 @@ Frame {
         icon.source: "img/ic_delete"
         text: "Remove"
         onTriggered: {
-            workspaceModel.remove(itemMenu.spaceIndex)
+            let data = spaceListModel.data(itemMenu.spaceIndex)
+            workspaceModel.remove(data.name)
             spaceListModel.remove(itemMenu.spaceIndex)
         }
     }

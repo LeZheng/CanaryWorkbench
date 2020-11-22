@@ -81,6 +81,36 @@ void Workspace::clearActors()
     mActorList.clear();
 }
 
+QJsonObject Workspace::toJson()
+{
+    QJsonObject spaceJson;
+    spaceJson.insert("name", name());
+    QJsonArray actorArray;
+    foreach (auto actor , mActorList) {
+        QJsonObject actorJson;
+        actorJson.insert("x", actor->x());
+        actorJson.insert("y", actor->y());
+        actorJson.insert("width", actor->width());
+        actorJson.insert("height", actor->height());
+        actorJson.insert("id", actor->id());
+        actorJson.insert("actorId", actor->actorId());
+        actorArray.append(actorJson);
+    }
+    spaceJson.insert("actorList", actorArray);
+
+    QJsonArray pipeArray;
+    foreach (auto pipe , mPipeList) {
+        QJsonObject pipeJson;
+        pipeJson.insert("inputId", pipe->inputId());
+        pipeJson.insert("outputId", pipe->outputId());
+        pipeJson.insert("signalName", pipe->signalName());
+        pipeJson.insert("slotName", pipe->slotName());
+        pipeArray.append(pipeJson);
+    }
+    spaceJson.insert("pipeList", pipeArray);
+    return spaceJson;
+}
+
 void Workspace::appendPipe(QQmlListProperty<Pipe> *list, Pipe *pipe)
 {
     reinterpret_cast<Workspace *>(list->data)->appendPipe(pipe);
@@ -146,6 +176,7 @@ WorkspaceModel::WorkspaceModel(QObject *parent):QObject(parent)
             w->appendPipe(pipe);
         }
         workspaceList.append(w);
+        workspaceMap.insert(w->name(), w);
     }
     QJsonDocument d(spaceArray);
     qDebug() << "init:" << d.toJson();
@@ -163,26 +194,32 @@ QQmlListProperty<Workspace> WorkspaceModel::list()
 
 void WorkspaceModel::addJson(QJsonValue json)
 {
-    auto array = settings->value("space-list").toJsonArray();
-    array.append(json);
-    settings->setValue("space-list", array);
+    if(json.isObject()){
+        auto spaceJson = json.toObject();
+        auto w = new Workspace(spaceJson.value("name").toString(), this);
+        workspaceMap.insert(w->name(), w);
+
+        save(spaceJson);
+    }
 }
 
-void WorkspaceModel::remove(int index)
+void WorkspaceModel::remove(const QString &name)
 {
-    auto array = settings->value("space-list").toJsonArray();
-    array.removeAt(index);
-    settings->setValue("space-list", array);
+    auto w = workspaceMap.take(name);
+    if(w){
+        QJsonArray spaceArray;
+        foreach (auto space, workspaceMap.values()) {
+            auto json = space->toJson();
+            spaceArray.append(json);
+        }
+        w->deleteLater();
+        settings->setValue("space-list", spaceArray);
+    }
 }
 
 Workspace *WorkspaceModel::get(const QString &name)
 {
-    foreach (auto w, workspaceList) {
-        if(w->name() == name){
-            return w;
-        }
-    }
-    return nullptr;
+    return workspaceMap.value(name);
 }
 
 ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
@@ -207,14 +244,9 @@ Pipe *WorkspaceModel::addPipe(Workspace *space, QJsonObject json)
 
 void WorkspaceModel::save(const QJsonObject &json)
 {
-    const QString &name = json.value("name").toString();
-    auto spaceArray = settings->value("space-list").toJsonArray();
-    for(int i = 0;i < spaceArray.size();i++){
-        auto spaceJson = spaceArray.at(i).toObject();
-        if(spaceJson.value("name").toString() == name){
-            spaceArray.replace(i, json);
-            break;
-        }
+    QJsonArray spaceArray;
+    foreach (auto space, workspaceMap.values()) {
+        spaceArray.append(space->toJson());
     }
     settings->setValue("space-list", spaceArray);
     qDebug() << "save:" << QJsonDocument(spaceArray).toJson();

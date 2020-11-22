@@ -179,6 +179,7 @@ public:
     int actorCount() const;
     ActorItem *actorAt(int idx) const;
     void clearActors();
+    QJsonObject toJson();
 
 private:
     QString mName;
@@ -210,7 +211,7 @@ public slots:
     Q_INVOKABLE QJsonArray listJson();
     Q_INVOKABLE QQmlListProperty<Workspace> list();
     Q_INVOKABLE void addJson(QJsonValue json);
-    Q_INVOKABLE void remove(int index);
+    Q_INVOKABLE void remove(const QString &name);
     Q_INVOKABLE Workspace* get(const QString &name);
     Q_INVOKABLE ActorItem* addActor( Workspace *space,QJsonObject json);
     Q_INVOKABLE Pipe *addPipe(Workspace *space, QJsonObject json);
@@ -219,6 +220,7 @@ public slots:
 private:
     QSettings *settings;
     QList<Workspace *> workspaceList;
+    QMap<QString, Workspace*> workspaceMap;
 
 };
 

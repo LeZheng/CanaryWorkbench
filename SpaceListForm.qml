@@ -171,8 +171,8 @@ Frame {
         var list = workspaceModel.listJson()
         spaceListModel.clear()
 
-        var x = workspaceModel.list()
-        console.log("loaded:", x)
+        //        var x = workspaceModel.list()
+        //        console.log("loaded:", x)
         list.forEach(function (w) {
             spaceListModel.append(w)
         })

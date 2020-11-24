@@ -1,7 +1,7 @@
-import QtQuick 2.12
-import QtQuick.Controls 2.12
-import QtGraphicalEffects 1.12
-import QtQuick.Layouts 1.12
+import QtQuick 2.14
+import QtQuick.Controls 2.14
+import QtGraphicalEffects 1.14
+import QtQuick.Layouts 1.14
 import ActorItem 1.0
 
 Item {
@@ -21,8 +21,11 @@ Item {
 
     height: 100
     width: 100
-    x: actorItem.x
-    y: actorItem.y
+
+    onActorItemChanged: {
+        formRoot.x = actorItem.x
+        formRoot.y = actorItem.y
+    }
 
     Binding {
         target: actorItem
@@ -117,7 +120,10 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("complete:", name, form, actorItem.actorId)
+        let actor = actorModel.getActor(actorItem.actorId)
+        formRoot.form = actor.form
+        formRoot.type = actor.type
+        formRoot.name = actor.name
         if (form.length > 0) {
             let actor = Qt.createComponent(form).createObject(formFrame)
         } else {

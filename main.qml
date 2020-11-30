@@ -93,10 +93,16 @@ ApplicationWindow {
 
         SpaceListForm {
             id: spaceListForm
-            //            currentIndex: workbenchPages.currentIndex
             SplitView.preferredWidth: window.width * 0.2
 
             onWorkbenchOpenRequested: {
+                for (var i = 0; i < workbenchTabs.count; i++) {
+                    if (workbenchTabs.itemAt(i).text === name) {
+                        workbenchTabs.currentIndex = i
+                        return
+                    }
+                }
+
                 var tab = tabComponent.createObject(workbenchTabs, {
                                                         "text": name
                                                     })

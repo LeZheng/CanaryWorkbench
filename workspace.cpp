@@ -179,7 +179,6 @@ WorkspaceModel::WorkspaceModel(QObject *parent):QObject(parent)
         workspaceMap.insert(w->name(), w);
     }
     QJsonDocument d(spaceArray);
-    qDebug() << "init:" << d.toJson();
 }
 
 QJsonArray WorkspaceModel::listJson()
@@ -249,7 +248,6 @@ void WorkspaceModel::save(const QJsonObject &json)
         spaceArray.append(space->toJson());
     }
     settings->setValue("space-list", spaceArray);
-    qDebug() << "save:" << QJsonDocument(spaceArray).toJson();
 }
 
 Pipe::Pipe(QObject *parent):QObject(parent)
@@ -258,35 +256,3 @@ Pipe::Pipe(QObject *parent):QObject(parent)
 }
 
 ActorItem::ActorItem(QObject *parent) : QObject(parent) {}
-
-QStringList ActorItem::getSlots()
-{
-    QList<QString> slotList;
-    CActor *actor = nullptr; //TODO get from ActorModel;
-    if (actor) {
-        auto mObject = actor->metaObject();
-        for (int i = 0; i < mObject->methodCount(); i++) {
-            auto method = mObject->method(i);
-            if (method.methodType() == QMetaMethod::Slot && method.access() == QMetaMethod::Public) {
-                slotList.append(method.name());
-            }
-        }
-    }
-    return slotList;
-}
-
-QStringList ActorItem::getSignals()
-{
-    QList<QString> signalList;
-    CActor *actor = nullptr; //TODO get from ActorModel;
-    if (actor) {
-        auto mObject = actor->metaObject();
-        for (int i = 0; i < mObject->methodCount(); i++) {
-            auto method = mObject->method(i);
-            if (method.methodType() == QMetaMethod::Signal && method.access() == QMetaMethod::Public) {
-                signalList.append(method.name());
-            }
-        }
-    }
-    return signalList;
-}

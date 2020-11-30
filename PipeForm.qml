@@ -50,13 +50,14 @@ Item {
 
     Shape {
         anchors.fill: parent
+        antialiasing: true
         ShapePath {
             id: path
             strokeColor: "white"
-            strokeWidth: 6
+            strokeWidth: 4
             fillColor: "transparent"
             capStyle: ShapePath.RoundCap
-            strokeStyle: ShapePath.DashLine
+            strokeStyle: ShapePath.SolidLine
 
             property int joinStyleIndex: 0
 

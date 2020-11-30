@@ -125,10 +125,6 @@ public:
         return mWidth;
     }
 
-public slots:
-    QStringList getSlots();
-    QStringList getSignals();
-
 private:
     QString mId;
     QString mActorId;

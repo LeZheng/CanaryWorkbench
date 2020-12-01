@@ -25,9 +25,13 @@ Pane {
     }
 
     Flickable {
+        id: flickable
         anchors.fill: parent
         contentHeight: destArea.height
         contentWidth: destArea.width
+
+        ScrollBar.vertical: ScrollBar {}
+        ScrollBar.horizontal: ScrollBar {}
 
         DropArea {
             id: destArea
@@ -163,6 +167,9 @@ Pane {
                 var pipe = workspaceModel.addPipe(workspace, pipeJson)
                 console.log("add pipe:", pipe, JSON.stringify(pipeJson))
                 addPipe(pipe)
+            }
+            onStateChanged: {
+                flickable.interactive = actorForm.state != "resizing"
             }
         }
     }

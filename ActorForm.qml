@@ -9,7 +9,7 @@ Item {
 
     signal dragMoved(point p)
     signal pipeDropped(string inputId, string outputId, string signalName, string slotName)
-
+    property int frameWidth: 2
     property ActorItem actorItem
 
     property string form
@@ -48,6 +48,15 @@ Item {
         "form": form
     }
 
+    states: [
+        State {
+            name: "resizing"
+        },
+        State {
+            name: "idle"
+        }
+    ]
+
     Pane {
         anchors.fill: formRoot
         visible: formRoot.entered
@@ -64,6 +73,7 @@ Item {
 
         onExited: formRoot.entered = false
     }
+
     Frame {
         id: formFrame
         anchors {
@@ -73,6 +83,104 @@ Item {
             rightMargin: 10
             bottomMargin: 10
         }
+    }
+
+    MouseArea {
+        id: leftFrame
+        width: frameWidth
+        z: 3
+        cursorShape: Qt.SizeHorCursor
+        anchors {
+            topMargin: frameWidth
+            bottomMargin: frameWidth
+            top: formRoot.top
+            bottom: formRoot.bottom
+            left: formRoot.left
+        }
+
+        onPositionChanged: {
+            if (pressedButtons & Qt.LeftButton) {
+                if (formRoot.width - mouse.x >= 100) {
+                    formRoot.width = formRoot.width - mouse.x
+                    formRoot.x = formRoot.x + mouse.x
+                }
+            }
+        }
+        onPressed: formRoot.state = "resizing"
+        onReleased: formRoot.state = "idle"
+    }
+
+    MouseArea {
+        id: topFrame
+        height: frameWidth
+        z: 3
+        cursorShape: Qt.SizeVerCursor
+        anchors {
+            leftMargin: frameWidth
+            rightMargin: frameWidth
+            top: formRoot.top
+            right: formRoot.right
+            left: formRoot.left
+        }
+
+        onPositionChanged: {
+            if (pressedButtons & Qt.LeftButton) {
+                if (formRoot.height - mouse.y >= 100) {
+                    formRoot.height = formRoot.height - mouse.y
+                    formRoot.y = formRoot.y + mouse.y
+                }
+            }
+        }
+        onPressed: formRoot.state = "resizing"
+        onReleased: formRoot.state = "idle"
+    }
+
+    MouseArea {
+        id: rightFrame
+        width: frameWidth
+        z: 3
+        cursorShape: Qt.SizeHorCursor
+        anchors {
+            topMargin: frameWidth
+            bottomMargin: frameWidth
+            top: formRoot.top
+            bottom: formRoot.bottom
+            right: formRoot.right
+        }
+
+        onPositionChanged: {
+            if (pressedButtons & Qt.LeftButton) {
+                if (formRoot.width + mouse.x >= 100) {
+                    formRoot.width = formRoot.width + mouse.x
+                }
+            }
+        }
+        onPressed: formRoot.state = "resizing"
+        onReleased: formRoot.state = "idle"
+    }
+
+    MouseArea {
+        id: bottomFrame
+        width: frameWidth
+        z: 3
+        cursorShape: Qt.SizeVerCursor
+        anchors {
+            leftMargin: frameWidth
+            rightMargin: frameWidth
+            left: formRoot.left
+            bottom: formRoot.bottom
+            right: formRoot.right
+        }
+
+        onPositionChanged: {
+            if (pressedButtons & Qt.LeftButton) {
+                if (formRoot.height + mouse.y >= 100) {
+                    formRoot.height = formRoot.height + mouse.y
+                }
+            }
+        }
+        onPressed: formRoot.state = "resizing"
+        onReleased: formRoot.state = "idle"
     }
 
     Text {

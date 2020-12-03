@@ -4,8 +4,13 @@ import QtGraphicalEffects 1.14
 import QtQuick.Layouts 1.14
 import ActorItem 1.0
 
-Item {
+Rectangle {
     id: formRoot
+
+    border.width: 1
+    border.color: "white"
+    color: "transparent"
+    radius: 3
 
     signal dragMoved(point p)
     signal pipeDropped(string inputId, string outputId, string signalName, string slotName)
@@ -16,8 +21,6 @@ Item {
     property string name
     property string id
     property string type
-
-    property bool entered: false
 
     height: 100
     width: 100
@@ -57,21 +60,12 @@ Item {
         }
     ]
 
-    Pane {
-        anchors.fill: formRoot
-        visible: formRoot.entered
-    }
-
     MouseArea {
         id: dragArea
         z: 1
         hoverEnabled: true
         anchors.fill: parent
         drag.target: formRoot
-
-        onEntered: formRoot.entered = true
-
-        onExited: formRoot.entered = false
     }
 
     Frame {
@@ -79,9 +73,9 @@ Item {
         anchors {
             fill: parent
             topMargin: 30
-            leftMargin: 10
-            rightMargin: 10
-            bottomMargin: 10
+            leftMargin: 5
+            rightMargin: 5
+            bottomMargin: 5
         }
     }
 
@@ -187,7 +181,7 @@ Item {
         id: actorName
         text: name
         color: "white"
-        visible: formRoot.entered
+        anchors.margins: 3
         anchors.top: parent.top
         anchors.left: parent.left
     }
@@ -197,7 +191,6 @@ Item {
         width: 30
         height: 30
         z: 2
-        visible: formRoot.entered
         anchors {
             top: parent.top
             right: parent.right
@@ -242,12 +235,13 @@ Item {
     Rectangle {
         id: rect1
         border.width: 1
-        border.color: "red"
-        width: parent.width
-        height: 5
+        border.color: "black"
+        width: 8
+        height: 8
+        radius: 5
         z: 3
-        visible: formRoot.entered
         anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
 
         Drag.active: m1.drag.active
         Drag.supportedActions: Qt.LinkAction
@@ -260,25 +254,68 @@ Item {
         MouseArea {
             id: m1
             z: 3
-            hoverEnabled: true
             anchors.fill: parent
             drag.target: rect1
+        }
+    }
+
+    Rectangle {
+        id: rect2
+        border.width: 1
+        border.color: "black"
+        width: 8
+        height: 8
+        radius: 5
+        z: 3
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+
+        Drag.active: m2.drag.active
+        Drag.supportedActions: Qt.LinkAction
+        Drag.dragType: Drag.Automatic
+        Drag.mimeData: {
+            "id": actorItem.id,
+            "actorId": actorItem.actorId
+        }
+
+        MouseArea {
+            id: m2
+            z: 3
+            anchors.fill: parent
+            drag.target: rect2
+        }
+    }
+
+    Rectangle {
+        id: rect3
+        border.width: 1
+        border.color: "black"
+        width: 8
+        height: 8
+        radius: 5
+        z: 3
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+
+        Drag.active: m3.drag.active
+        Drag.supportedActions: Qt.LinkAction
+        Drag.dragType: Drag.Automatic
+        Drag.mimeData: {
+            "id": actorItem.id,
+            "actorId": actorItem.actorId
+        }
+
+        MouseArea {
+            id: m3
+            z: 3
+            anchors.fill: parent
+            drag.target: rect3
         }
     }
 
     DropArea {
         id: destArea
         anchors.fill: parent
-
-        onEntered: {
-            console.log("actor enter:", drag.source)
-            if (drag.supportedActions == Qt.LinkAction) {
-                formRoot.entered = true
-                //                drag.accepted = true
-            }
-        }
-
-        onExited: formRoot.entered = false
 
         onPositionChanged: {
             if (drag.supportedActions == Qt.LinkAction) {

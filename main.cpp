@@ -26,8 +26,9 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<WorkspaceModel>("WorkspaceModel", 1,0,"WorkspaceModel",QLatin1String("WorkspaceModel are read-only"));
     qmlRegisterUncreatableType<CActorGroup>("CActorGroup", 1,0,"CActorGroup",QLatin1String("CActorGroup are read-only"));
 
-    engine.rootContext()->setContextProperty("workspaceModel", new WorkspaceModel());
+    auto am = new ActorModel();
     engine.rootContext()->setContextProperty("actorModel", new ActorModel());
+    engine.rootContext()->setContextProperty("workspaceModel", new WorkspaceModel(am));
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

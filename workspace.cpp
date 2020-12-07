@@ -3,6 +3,7 @@
 #include <QJsonObject>
 #include <QMetaMethod>
 #include <QDebug>
+#include <cactor.h>
 
 Workspace::Workspace(const QString &name,QObject *parent):QObject(parent),mName(name)
 {
@@ -151,8 +152,9 @@ void Workspace::clearActors(QQmlListProperty<ActorItem> *list)
     return reinterpret_cast<Workspace *>(list->data)->clearActors();
 }
 
-WorkspaceModel::WorkspaceModel(QObject *parent):QObject(parent)
+WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
 {
+    this->actorModel = m;
     this->settings = new QSettings("Workspace Settings", QSettings::IniFormat, this);
     auto spaceArray = settings->value("space-list").toJsonArray();
     foreach (auto space, spaceArray) {
@@ -226,6 +228,10 @@ ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
     auto actor = new ActorItem(space);
     foreach (auto key , json.keys()) {
         actor->setProperty(key.toStdString().data(), json.value(key));
+    }
+    auto a = actorModel->getActor(actor->actorId());
+    if (a) {
+        actor->setImpl(a->clone(actor));
     }
     space->appendActor(actor);
     return actor;

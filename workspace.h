@@ -76,6 +76,7 @@ class ActorItem : public QObject
     Q_PROPERTY(int y READ y WRITE setY NOTIFY yChanged)
     Q_PROPERTY(int width READ width WRITE setWidth NOTIFY widthChanged)
     Q_PROPERTY(int height READ height WRITE setHeight NOTIFY heightChanged)
+    Q_PROPERTY(CActor * impl READ impl WRITE setImpl)
 public:
     explicit ActorItem(QObject *parent = nullptr);
 
@@ -121,8 +122,12 @@ public:
         emit widthChanged(mWidth);
     }
 
-    int width(){
-        return mWidth;
+    int width() { return mWidth; }
+
+    void setImpl( CActor *a) { this->mActor = a;
+    }
+
+    CActor *impl() { return mActor;
     }
 
 private:
@@ -132,6 +137,7 @@ private:
     int mY;
     int mWidth;
     int mHeight;
+    CActor *mActor;
 
 signals:
     void idChanged(QString id);
@@ -201,7 +207,7 @@ class WorkspaceModel:public QObject
     Q_OBJECT
 
 public:
-    WorkspaceModel(QObject *parent = nullptr);
+    WorkspaceModel(ActorModel *actorModel, QObject *parent = nullptr);
 
 public slots:
     Q_INVOKABLE QJsonArray listJson();
@@ -217,7 +223,7 @@ private:
     QSettings *settings;
     QList<Workspace *> workspaceList;
     QMap<QString, Workspace*> workspaceMap;
-
+    ActorModel *actorModel;
 };
 
 #endif // WORKSPACE_H

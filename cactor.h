@@ -20,6 +20,7 @@ class CActor : public QObject
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString form READ form WRITE setForm NOTIFY formChanged)
     Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged)
+    Q_PROPERTY(QString state READ state WRITE setState NOTIFY stateChanged)
 
 
 public:
@@ -91,6 +92,16 @@ public:
         emit descriptionChanged(mDesc);
     }
 
+    QString state() { return mState; }
+
+    void setState(const QString &s)
+    {
+        this->mState = s;
+        emit stateChanged(mState);
+    }
+
+    CActor *clone(const QObject *parent = nullptr);
+
 private:
     QString mId;
     QString mType;
@@ -98,6 +109,7 @@ private:
     QString mName;
     QString mForm;
     QString mDesc;
+    QString mState;
 
 signals:
     void idChanged(QString id);
@@ -106,6 +118,7 @@ signals:
     void nameChanged(QString name);
     void formChanged(QString form);
     void descriptionChanged(QString desc);
+    void stateChanged(QString state);
 };
 
 class CActorGroup : public QObject
@@ -189,7 +202,7 @@ private:
 
 
 public slots:
-    void start();
+    void start(QStringList args);
     void stop();
     void send(const QString &msg);
 signals:

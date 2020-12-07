@@ -52,6 +52,18 @@ QStringList CActor::getSlots()
     return slotList;
 }
 
+CActor *CActor::clone(const QObject *parent)
+{
+    auto actor = metaObject()->newInstance(QGenericArgument("", parent));
+
+    for (int i = 0; i < metaObject()->propertyCount(); i++) {
+        auto p = metaObject()->property(i);
+        actor->setProperty(p.name(), property(p.name()));
+    }
+
+    return static_cast<CActor *>(actor);
+}
+
 
 CActor *CActorFactory::create(const QString &json, QObject *parent)
 {
@@ -192,10 +204,10 @@ CmdActor::CmdActor(QObject *parent):CActor(parent)
 
 }
 
-void CmdActor::start()
+void CmdActor::start(QStringList args)
 {
     this->process = new QProcess(this);
-    this->process->start(mCmd);
+    this->process->start(mCmd, args);
 
     connect(this->process, &QProcess::readyRead, this, [this]() {
         QString msg(this->process->readAll());
@@ -203,7 +215,13 @@ void CmdActor::start()
     });
 
     connect(this->process, &QProcess::stateChanged, this, [this](QProcess::ProcessState newState) {
-        //TODO
+        if (newState == QProcess::Running) {
+            setState("Running");
+        } else if (newState == QProcess::Starting) {
+            setState("Starting");
+        } else if (newState == QProcess::NotRunning) {
+            setState("NotRunning");
+        }
     });
 
     connect(this->process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {

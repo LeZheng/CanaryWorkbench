@@ -24,13 +24,15 @@ class CActor : public QObject
 
 
 public:
-    explicit CActor(QObject *parent = nullptr);
+    explicit CActor( QObject *parent = nullptr);
 
     static CActor *create(const QString &json, QObject *parent = nullptr);
 
     Q_INVOKABLE QStringList getSignals();
 
     Q_INVOKABLE QStringList getSlots();
+
+    Q_INVOKABLE QJsonArray getSlotList();
 
     QString id()
     {
@@ -76,7 +78,10 @@ public:
         emit nameChanged(name);
     }
 
-    QString form() { return mForm; }
+    QString form()
+    {
+        return mForm;
+    }
 
     void setForm(const QString &form)
     {
@@ -84,7 +89,10 @@ public:
         emit formChanged(mForm);
     }
 
-    QString description() { return mDesc; }
+    QString description()
+    {
+        return mDesc;
+    }
 
     void setDescription(const QString &desc)
     {
@@ -92,7 +100,10 @@ public:
         emit descriptionChanged(mDesc);
     }
 
-    QString state() { return mState; }
+    QString state()
+    {
+        return mState;
+    }
 
     void setState(const QString &s)
     {
@@ -100,7 +111,7 @@ public:
         emit stateChanged(mState);
     }
 
-    CActor *clone(const QObject *parent = nullptr);
+    CActor *clone(QObject *parent = nullptr);
 
 private:
     QString mId;
@@ -184,7 +195,7 @@ class CmdActor : public CActor
 
     Q_PROPERTY(QString cmd READ cmd WRITE setCmd NOTIFY cmdChanged)
 public:
-    explicit CmdActor(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CmdActor(QObject *parent = nullptr);
 
     void setCmd(const QString &cmd)
     {

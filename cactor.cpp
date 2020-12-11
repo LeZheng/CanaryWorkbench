@@ -4,6 +4,7 @@
 #include <QVariant>
 #include <QMetaObject>
 #include <QMetaMethod>
+#include <QDebug>
 
 CActor::CActor(QObject *parent) : QObject(parent)
 {
@@ -31,9 +32,9 @@ CActor *CActor::create(const QString &json, QObject *parent)
 QStringList CActor::getSignals()
 {
     QStringList signalList;
-    for(int i = 0;i < metaObject()->methodCount();i++){
+    for(int i = 0; i < metaObject()->methodCount(); i++) {
         auto method = metaObject()->method(i);
-        if(method.methodType() == QMetaMethod::Signal){
+        if(method.methodType() == QMetaMethod::Signal) {
             signalList.append(method.name());
         }
     }
@@ -43,22 +44,46 @@ QStringList CActor::getSignals()
 QStringList CActor::getSlots()
 {
     QStringList slotList;
-    for(int i = 0;i < metaObject()->methodCount();i++){
+    for(int i = 0; i < metaObject()->methodCount(); i++) {
         auto method = metaObject()->method(i);
-        if(method.methodType() == QMetaMethod::Slot){
+        if(method.methodType() == QMetaMethod::Slot) {
             slotList.append(method.name());
         }
     }
     return slotList;
 }
 
-CActor *CActor::clone(const QObject *parent)
+QJsonArray CActor::getSlotList()
 {
-    auto actor = metaObject()->newInstance(QGenericArgument("", parent));
+    QJsonArray slotArray;
+    auto mObj = metaObject();
+    for (int i = 0; i < mObj->methodCount(); i++) {
+        auto m = mObj->method(i);
+        if (m.methodType() == QMetaMethod::Slot) {
+            QString name = m.name();
+            QString returnType = m.typeName();
+            auto nameList = m.parameterNames();
+            QJsonArray names;
+            for (auto pName : nameList) {
+                names.append(QJsonDocument::fromBinaryData(pName).object());
+            }
+            slotArray.append( QJsonObject{{"name", name}, {"returnType", returnType}, {"parameters", names}});
+
+        }
+    }
+
+    return slotArray;
+}
+
+CActor *CActor::clone(QObject *parent)
+{
+    auto mObj = metaObject();
+    auto actor = mObj->newInstance(Q_ARG(QObject *, parent));//TODO null
 
     for (int i = 0; i < metaObject()->propertyCount(); i++) {
         auto p = metaObject()->property(i);
-        actor->setProperty(p.name(), property(p.name()));
+        auto value = property(p.name());
+        actor->setProperty(p.name(), value);
     }
 
     return static_cast<CActor *>(actor);

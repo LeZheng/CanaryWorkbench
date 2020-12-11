@@ -66,6 +66,14 @@ Rectangle {
         hoverEnabled: true
         anchors.fill: parent
         drag.target: formRoot
+
+        onClicked: {
+            console.log("click....")
+            if (mouse.button == Qt.RightButton) {
+                let slotList = actorItem.impl.getSlotList()
+                console.log("slots:", slotList)
+            }
+        }
     }
 
     Frame {

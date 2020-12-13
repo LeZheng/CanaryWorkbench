@@ -66,12 +66,20 @@ Rectangle {
         hoverEnabled: true
         anchors.fill: parent
         drag.target: formRoot
+        acceptedButtons: Qt.RightButton | Qt.LeftButton
 
         onClicked: {
-            console.log("click....")
             if (mouse.button == Qt.RightButton) {
-                let slotList = actorItem.impl.getSlotList()
-                console.log("slots:", slotList)
+                let slotList = formRoot.actorItem.impl.getSlotList()
+
+                slotList.forEach(function (slot) {
+                    console.log("slots:", JSON.stringify(slot))
+                    let act = slotActComponent.createObject(slotMenu, {
+                                                                "actorSlot": slot
+                                                            })
+                    slotMenu.addAction(act)
+                })
+                contextMenu.popup(dragArea, mouse.x, mouse.y)
             }
         }
     }
@@ -204,12 +212,7 @@ Rectangle {
             right: parent.right
         }
 
-        icon.source: "img/ic_close"
-
-        onClicked: {
-            //TODO
-            formRoot.destroy()
-        }
+        action: closeAction
     }
 
     Component {
@@ -396,6 +399,53 @@ Rectangle {
             onAccepted: {
                 formRoot.pipeDropped(sourceId, targetId, signalBox.currentText,
                                      slotBox.currentText)
+            }
+        }
+    }
+
+    Menu {
+        id: contextMenu
+
+        Menu {
+            id: slotMenu
+            title: "Action..."
+        }
+
+        MenuSeparator {}
+
+        MenuItem {
+            action: closeAction
+        }
+
+        onClosed: {
+            let count = slotMenu.count
+            for (var i = 0; i < count; i++) {
+                slotMenu.takeAction(0)
+            }
+        }
+    }
+
+    Action {
+        id: closeAction
+        text: "close"
+        icon.source: "img/ic_close"
+
+        onTriggered: {
+            //TODO
+            formRoot.destroy()
+        }
+    }
+
+    Component {
+        id: slotActComponent
+
+        Action {
+            property var actorSlot: null
+            id: slotAction
+            text: actorSlot.name
+
+            onTriggered: {
+                formRoot.actorItem.impl[actorSlot.name]([])
             }
         }
     }

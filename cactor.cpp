@@ -63,9 +63,10 @@ QJsonArray CActor::getSlotList()
             QString name = m.name();
             QString returnType = m.typeName();
             auto nameList = m.parameterNames();
+            auto typeList = m.parameterTypes();
             QJsonArray names;
-            for (auto pName : nameList) {
-                names.append(QJsonDocument::fromBinaryData(pName).object());
+            for (int j = 0; j < nameList.size(); j++) {
+                names.append(QJsonObject{{"name", QString(nameList.at(j))},{"type", QString(typeList.at(j))}});
             }
             slotArray.append( QJsonObject{{"name", name}, {"returnType", returnType}, {"parameters", names}});
 

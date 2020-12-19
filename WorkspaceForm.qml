@@ -19,11 +19,6 @@ Pane {
     width: 400
     height: 400
 
-    background: FastBlur {
-        opacity: 0.7
-        radius: 25
-    }
-
     Flickable {
         id: flickable
         anchors.fill: parent
@@ -106,7 +101,7 @@ Pane {
             property point endPoint: Qt.point(0, 0)
 
             ShapePath {
-                strokeColor: "yellow"
+                strokeColor: "aquamarine"
                 strokeWidth: 6
                 fillColor: "transparent"
                 capStyle: ShapePath.RoundCap

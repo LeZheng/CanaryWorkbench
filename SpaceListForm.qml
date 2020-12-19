@@ -39,7 +39,6 @@ Frame {
                 text: name
                 anchors.verticalCenter: parent.verticalCenter
                 font.bold: true
-                color: "white"
             }
             MouseArea {
                 anchors.fill: parent
@@ -67,10 +66,7 @@ Frame {
         }
 
         highlight: Rectangle {
-            border.color: "lightsteelblue"
-            border.width: 2
-            color: "transparent"
-            radius: 5
+            color: "powderblue"
             Behavior on y {
                 SpringAnimation {
                     spring: 3

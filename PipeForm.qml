@@ -53,7 +53,7 @@ Item {
         antialiasing: true
         ShapePath {
             id: path
-            strokeColor: "white"
+            strokeColor: "aquamarine"
             strokeWidth: 4
             fillColor: "transparent"
             capStyle: ShapePath.RoundCap

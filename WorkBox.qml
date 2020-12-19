@@ -13,10 +13,6 @@ Page {
     header: ToolBar {
         id: topBar
         width: parent.width
-        background: FastBlur {
-            opacity: 0.7
-            radius: 25
-        }
         RowLayout {
             anchors.leftMargin: 4
             anchors.fill: parent
@@ -50,11 +46,6 @@ Page {
     footer: ToolBar {
         id: bottomBar
         width: parent.width
-
-        background: FastBlur {
-            opacity: 0.7
-            radius: 25
-        }
 
         RowLayout {
             height: parent.height
@@ -123,7 +114,7 @@ Page {
                 anchors.fill: itemFrame
                 radius: 8
                 samples: 17
-                color: "#99505050"
+                color: "powderblue"
                 source: bgRect
                 opacity: itemFrame.hovered ? 1 : 0
             }
@@ -139,7 +130,7 @@ Page {
                     border.color: "gray"
 
                     radius: 3
-                    color: itemFrame.hovered ? "#99505050" : "transparent"
+                    color: itemFrame.hovered ? "powderblue" : "transparent"
 
                     Behavior on color {
                         ColorAnimation {
@@ -152,7 +143,6 @@ Page {
                     text: name
                     anchors.verticalCenter: parent.verticalCenter
                     font.bold: true
-                    color: "white"
                 }
             }
 

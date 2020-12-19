@@ -11,14 +11,13 @@ ApplicationWindow {
     height: 768
     title: qsTr("Stack")
 
-    background: FastBlur {
-        source: Image {
-            source: "img/main_bg"
-        }
+    //    background: FastBlur {
+    //        source: Image {
+    //            source: "img/main_bg"
+    //        }
 
-        radius: 63
-    }
-
+    //        radius: 63
+    //    }
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")

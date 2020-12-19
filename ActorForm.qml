@@ -8,9 +8,10 @@ Rectangle {
     id: formRoot
 
     border.width: 1
-    border.color: "white"
-    color: "transparent"
+    border.color: "black"
+    color: "white"
     radius: 3
+    clip: false
 
     signal dragMoved(point p)
     signal pipeDropped(string inputId, string outputId, string signalName, string slotName)
@@ -196,7 +197,6 @@ Rectangle {
     Text {
         id: actorName
         text: name
-        color: "white"
         anchors.margins: 3
         anchors.top: parent.top
         anchors.left: parent.left
@@ -445,8 +445,54 @@ Rectangle {
             text: actorSlot.name
 
             onTriggered: {
-                formRoot.actorItem.impl[actorSlot.name]([])
+                actorSlot.parameters.forEach(function (p) {
+                    argModel.append(p)
+                })
+                argDialog.open()
+                //                formRoot.actorItem.impl[actorSlot.name].apply(null, [[]]) //TODO
             }
+        }
+    }
+
+    Dialog {
+        id: argDialog
+
+        width: 200
+        height: 200
+
+        Component {
+            id: argComponent
+
+            RowLayout {
+                Label {
+                    text: name
+                }
+
+                TextField {
+                    placeholderText: type
+                    Layout.fillWidth: true
+                }
+            }
+        }
+
+        ListModel {
+            id: argModel
+        }
+
+        contentItem: ListView {
+            id: argListView
+            model: argModel
+            delegate: argComponent
+        }
+
+        onClosed: {
+            argModel.clear()
+        }
+
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        onAccepted: {
+
+            console.log("Ok clicked")
         }
     }
 }

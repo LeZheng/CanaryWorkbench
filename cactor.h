@@ -209,7 +209,7 @@ public:
 
 private:
     QString mCmd;
-    QProcess *process;
+    QProcess *process = nullptr;
 
 
 public slots:

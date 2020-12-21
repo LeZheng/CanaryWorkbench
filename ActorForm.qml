@@ -3,6 +3,7 @@ import QtQuick.Controls 2.14
 import QtGraphicalEffects 1.14
 import QtQuick.Layouts 1.14
 import ActorItem 1.0
+import QtQuick.Dialogs 1.2
 
 Rectangle {
     id: formRoot
@@ -337,7 +338,6 @@ Rectangle {
         }
 
         onDropped: {
-            console.log("actor drop")
             if (drop.supportedActions == Qt.LinkAction) {
                 drop.acceptProposedAction()
                 drop.accepted = true
@@ -445,54 +445,32 @@ Rectangle {
             text: actorSlot.name
 
             onTriggered: {
-                actorSlot.parameters.forEach(function (p) {
-                    argModel.append(p)
-                })
-                argDialog.open()
-                //                formRoot.actorItem.impl[actorSlot.name].apply(null, [[]]) //TODO
+                if (actorSlot.parameters.length > 0) {
+                    let params = actorSlot.parameters.map(function (p) {
+                        return JSON.parse(JSON.stringify(p))
+                    })
+                    let dialog = argDialogComponent.createObject(formRoot, {
+                                                                     "argDescList": params
+                                                                 })
+
+                    dialog.open()
+                    dialog.inputCompleted.connect(function (args) {
+                        console.log("args:", args)
+                        formRoot.actorItem.impl[actorSlot.name].apply(null,
+                                                                      args)
+                    })
+                } else {
+                    formRoot.actorItem.impl[actorSlot.name].apply(null)
+                }
             }
         }
     }
 
-    Dialog {
-        id: argDialog
+    Component {
+        id: argDialogComponent
 
-        width: 200
-        height: 200
-
-        Component {
-            id: argComponent
-
-            RowLayout {
-                Label {
-                    text: name
-                }
-
-                TextField {
-                    placeholderText: type
-                    Layout.fillWidth: true
-                }
-            }
-        }
-
-        ListModel {
-            id: argModel
-        }
-
-        contentItem: ListView {
-            id: argListView
-            model: argModel
-            delegate: argComponent
-        }
-
-        onClosed: {
-            argModel.clear()
-        }
-
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        onAccepted: {
-
-            console.log("Ok clicked")
+        ArgumentDialog {
+            id: argDialog
         }
     }
 }

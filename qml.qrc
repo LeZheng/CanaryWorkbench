@@ -10,6 +10,7 @@
         <file>CmdActor.qml</file>
         <file>ActorForm.qml</file>
         <file>PipeForm.qml</file>
+        <file>ArgumentDialog.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="main_bg">img/main_bg.png</file>

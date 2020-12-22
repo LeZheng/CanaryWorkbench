@@ -3,7 +3,6 @@ import QtQuick.Controls 2.14
 import QtGraphicalEffects 1.14
 import QtQuick.Layouts 1.14
 import ActorItem 1.0
-import QtQuick.Dialogs 1.2
 
 Rectangle {
     id: formRoot
@@ -431,7 +430,7 @@ Rectangle {
         icon.source: "img/ic_close"
 
         onTriggered: {
-            //TODO
+            //TODO delete pipe first
             formRoot.destroy()
         }
     }
@@ -456,8 +455,8 @@ Rectangle {
                     dialog.open()
                     dialog.inputCompleted.connect(function (args) {
                         console.log("args:", args)
-                        formRoot.actorItem.impl[actorSlot.name].apply(null,
-                                                                      args)
+                        formRoot.actorItem.impl[actorSlot.name].apply(
+                                    null, args ? args : null)
                     })
                 } else {
                     formRoot.actorItem.impl[actorSlot.name].apply(null)

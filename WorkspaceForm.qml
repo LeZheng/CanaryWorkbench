@@ -129,16 +129,25 @@ Pane {
                                                })
         root.actorFormMap[actor.id] = form
         form.Component.onDestruction.connect(function () {
+            console.log("addActor:delete")
             root.actorFormMap[actor.id] = null //TODO delete key
         })
     }
 
     function addPipe(pipe) {
-        pipeComponent.createObject(destArea, {
-                                       "pipe": pipe,
-                                       "sourceForm": root.actorFormMap[pipe.inputId],
-                                       "targetForm": root.actorFormMap[pipe.outputId]
-                                   })
+        let source = root.actorFormMap[pipe.inputId]
+        let target = root.actorFormMap[pipe.outputId]
+        var pipeForm = pipeComponent.createObject(destArea, {
+                                                      "pipe": pipe,
+                                                      "sourceForm": source,
+                                                      "targetForm": target
+                                                  })
+        let desFun = function () {
+            if (pipeForm)
+                pipeForm.destroy()
+        }
+        target.Component.onDestruction.connect(desFun)
+        source.Component.onDestruction.connect(desFun)
     }
 
     Component {

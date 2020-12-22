@@ -46,7 +46,7 @@ Dialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
         argDialog.inputCompleted(argDescList.map(function (arg) {
-            return arg.value
+            return arg.value ? arg.value : ""
         }))
     }
 

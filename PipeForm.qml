@@ -27,16 +27,24 @@ Item {
     }
 
     onSourceFormChanged: {
+        //        if (sourceForm === null) {
+        //            formRoot.destroy()
+        //        } else {
         sourceForm.onXChanged.connect(updatePathPoint)
         sourceForm.onYChanged.connect(updatePathPoint)
         sourceForm.onHeightChanged.connect(updatePathPoint)
         sourceForm.onWidthChanged.connect(updatePathPoint)
+        //        }
     }
     onTargetFormChanged: {
+        //        if (targetForm === null) {
+        //            formRoot.destroy()
+        //        } else {
         targetForm.onXChanged.connect(updatePathPoint)
         targetForm.onYChanged.connect(updatePathPoint)
         targetForm.onHeightChanged.connect(updatePathPoint)
         targetForm.onWidthChanged.connect(updatePathPoint)
+        //        }
     }
 
     anchors {

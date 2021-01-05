@@ -5,6 +5,7 @@
 #include <QMetaObject>
 #include <QMetaMethod>
 #include <QDebug>
+#include <QMessageBox>
 
 CActor::CActor(QObject *parent) : QObject(parent)
 {
@@ -145,6 +146,38 @@ ActorModel::ActorModel(QObject *parent)
             actorMap.insert(actor->id(), actor);
         }
     }
+//------------------
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("CanaryData.db");
+    if (!db.open()) {
+        QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
+                              QObject::tr("Unable to establish a database connection.\n"
+                                          "This example needs SQLite support. Please read "
+                                          "the Qt SQL driver documentation for information how "
+                                          "to build it.\n\n"
+                                          "Click Cancel to exit."), QMessageBox::Cancel);
+        return;
+    }
+    QStringList tables = db.tables();
+    if(!tables.contains("Actor")) {
+        QSqlQuery query;
+        bool r = query.exec("CREATE TABLE Actor ("
+                            "id INTEGER PRIMARY KEY  AUTOINCREMENT, "
+                            "type TEXT, "
+                            "groupName TEXT, "
+                            "name TEXT, "
+                            "form TEXT, "
+                            "description TEXT, "
+                            "data Text"
+                            ")");
+        if (query.lastError().isValid())
+            qDebug() << query.lastError();
+
+    }
+    dbModel = new QSqlTableModel(this, db);
+    dbModel->setTable("Actor");
+    dbModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    dbModel->select();
 }
 
 CActor *ActorModel::getActor(const QString &id)
@@ -179,6 +212,19 @@ void ActorModel::addActor(QJsonObject json)
         auto actorArray = this->settings->value("actor-list").toJsonArray();
         actorArray.append(json);
         this->settings->setValue("actor-list", actorArray);
+
+        QSqlRecord r;
+        auto idf = QSqlField("id", QVariant::Int);
+        idf.setAutoValue(true);
+        r.append(idf);
+        foreach (auto k, json.keys()) {
+            auto v = json.value(k).toVariant();
+            auto f = QSqlField(k, v.type());
+            f.setValue(v);
+            r.append(f);
+        }
+        bool s = dbModel->insertRecord(-1, r);
+        dbModel->submitAll();
     }
 }
 
@@ -233,7 +279,7 @@ CmdActor::CmdActor(QObject *parent):CActor(parent)
 void CmdActor::start(QStringList args)
 {
     this->process = new QProcess(this);
-    this->process->start(mCmd, args);
+    this->process->start(data(), args);
 
     connect(this->process, &QProcess::readyRead, this, [this]() {
         QString msg(this->process->readAll());

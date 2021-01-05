@@ -15,6 +15,22 @@
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="cactor.cpp" line="153"/>
+        <source>Cannot open database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="cactor.cpp" line="154"/>
+        <source>Unable to establish a database connection.
+This example needs SQLite support. Please read the Qt SQL driver documentation for information how to build it.
+
+Click Cancel to exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>WorkBox</name>
     <message>
         <location filename="WorkBox.qml" line="205"/>

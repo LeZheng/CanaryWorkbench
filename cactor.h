@@ -10,17 +10,20 @@
 #include <QQmlListProperty>
 #include <QProcess>
 
+#include <QtSql>
+
 class CActor : public QObject
 {
     Q_OBJECT
 
     Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
-    Q_PROPERTY(QString group READ group WRITE setGroup NOTIFY groupChanged)
+    Q_PROPERTY(QString groupName READ groupName WRITE setGroupName NOTIFY groupNameChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString form READ form WRITE setForm NOTIFY formChanged)
     Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged)
     Q_PROPERTY(QString state READ state WRITE setState NOTIFY stateChanged)
+    Q_PROPERTY(QString data READ data WRITE setData NOTIFY dataChanged)
 
 
 public:
@@ -56,15 +59,15 @@ public:
         emit typeChanged(mType);
     }
 
-    QString group()
+    QString groupName()
     {
         return mGroup;
     }
 
-    void setGroup(const QString &group)
+    void setGroupName(const QString &group)
     {
         this->mGroup = group;
-        emit groupChanged(mGroup);
+        emit groupNameChanged(mGroup);
     }
 
     QString name()
@@ -111,6 +114,17 @@ public:
         emit stateChanged(mState);
     }
 
+    QString data()
+    {
+        return mData;
+    }
+
+    void setData(const QString &d)
+    {
+        this->mData = d;
+        emit dataChanged(d);
+    }
+
     CActor *clone(QObject *parent = nullptr);
 
 private:
@@ -121,15 +135,17 @@ private:
     QString mForm;
     QString mDesc;
     QString mState;
+    QString mData;
 
 signals:
     void idChanged(QString id);
     void typeChanged(QString type);
-    void groupChanged(QString group);
+    void groupNameChanged(QString group);
     void nameChanged(QString name);
     void formChanged(QString form);
     void descriptionChanged(QString desc);
     void stateChanged(QString state);
+    void dataChanged(QString data);
 };
 
 class CActorGroup : public QObject
@@ -177,6 +193,8 @@ public slots:
 private:
     QSettings *settings;
     QMap<QString, CActor *> actorMap;
+    QSqlDatabase db;
+    QSqlTableModel *dbModel;
 };
 
 class CActorFactory
@@ -193,22 +211,10 @@ class CmdActor : public CActor
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString cmd READ cmd WRITE setCmd NOTIFY cmdChanged)
 public:
     Q_INVOKABLE explicit CmdActor(QObject *parent = nullptr);
 
-    void setCmd(const QString &cmd)
-    {
-        this->mCmd = cmd;
-        emit cmdChanged(mCmd);
-    }
-    QString cmd()
-    {
-        return mCmd;
-    }
-
 private:
-    QString mCmd;
     QProcess *process = nullptr;
 
 

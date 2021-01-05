@@ -354,10 +354,9 @@ Page {
 
         onAccepted: {
             let actor = {
-                "id": cmdNameField.text,
                 "name": cmdNameField.text,
-                "cmd": cmdTextField.text,
-                "group": groupListBox.currentText,
+                "data": cmdTextField.text,
+                "groupName": groupListBox.currentText,
                 "description": cmdDescField.text,
                 "type": "cmd",
                 "form": "CmdActor.qml"

@@ -18,12 +18,15 @@ Page {
             anchors.fill: parent
 
             ComboBox {
+                textRole: "name"
                 currentIndex: 0
                 Layout.fillWidth: true
                 id: groupListBox
                 model: ListModel {
                     id: groupListModel
                 }
+
+                onCurrentIndexChanged: loadActor()
             }
 
             ToolButton {
@@ -205,8 +208,8 @@ Page {
         text: qsTr("Delete")
         icon.source: "img/ic_delete"
         onTriggered: {
-            let actorName = actorListModel.get(actorSetView.currentIndex).name
-            actorModel.removeActor(actorName)
+            let actorId = actorListModel.get(actorSetView.currentIndex).id
+            actorModel.removeActor(actorId)
             actorListModel.remove(actorSetView.currentIndex)
         }
     }
@@ -222,8 +225,8 @@ Page {
         text: qsTr("Clear All")
         icon.source: "img/ic_clear"
         onTriggered: {
-            let groupName = groupListBox.currentText
-            actorModel.removeActors(groupName)
+            let groupId = groupListModel.get(groupListBox.currentIndex).id
+            actorModel.removeActors(groupId)
             actorListModel.clear()
         }
     }
@@ -293,7 +296,7 @@ Page {
                 var item = {
                     "name": groupNameText.text
                 }
-                actorModel.addGroupJson(item)
+                item = actorModel.addGroupJson(item)
                 groupListModel.append(item)
             }
         }
@@ -356,11 +359,12 @@ Page {
             let actor = {
                 "name": cmdNameField.text,
                 "data": cmdTextField.text,
-                "groupName": groupListBox.currentText,
+                "groupId": groupListModel.get(groupListBox.currentIndex).id,
                 "description": cmdDescField.text,
                 "type": "cmd",
                 "form": "CmdActor.qml"
             }
+
             actorModel.addActor(actor)
             actorListModel.append(actor)
         }
@@ -369,7 +373,8 @@ Page {
     Component.onCompleted: {
         var groupList = actorModel.listGroupJson()
         groupListModel.append({
-                                  "name": "default"
+                                  "name": "default",
+                                  "id" : "0"
                               })
         groupList.forEach(function (group) {
             groupListModel.append(group)
@@ -379,7 +384,7 @@ Page {
     }
 
     function loadActor() {
-        let actorList = actorModel.getGroupActors(groupListBox.currentText)
+        let actorList = actorModel.getGroupActors(groupListModel.get(groupListBox.currentIndex).id)
         actorListModel.clear()
         actorList.forEach(function (actor) {
             actorListModel.append(actor)

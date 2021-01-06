@@ -232,7 +232,7 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        let actor = actorModel.getActor(actorItem.actorId)
+        let actor = actorItem.impl
         formRoot.form = actor.form
         formRoot.type = actor.type
         formRoot.name = actor.name

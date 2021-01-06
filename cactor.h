@@ -18,7 +18,7 @@ class CActor : public QObject
 
     Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
-    Q_PROPERTY(QString groupName READ groupName WRITE setGroupName NOTIFY groupNameChanged)
+    Q_PROPERTY(QString groupId READ groupId WRITE setGroupId NOTIFY groupIdChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString form READ form WRITE setForm NOTIFY formChanged)
     Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged)
@@ -59,15 +59,15 @@ public:
         emit typeChanged(mType);
     }
 
-    QString groupName()
+    QString groupId()
     {
         return mGroup;
     }
 
-    void setGroupName(const QString &group)
+    void setGroupId(const QString &group)
     {
         this->mGroup = group;
-        emit groupNameChanged(mGroup);
+        emit groupIdChanged(mGroup);
     }
 
     QString name()
@@ -140,7 +140,7 @@ private:
 signals:
     void idChanged(QString id);
     void typeChanged(QString type);
-    void groupNameChanged(QString group);
+    void groupIdChanged(QString group);
     void nameChanged(QString name);
     void formChanged(QString form);
     void descriptionChanged(QString desc);
@@ -183,7 +183,7 @@ public:
 
 public slots:
     Q_INVOKABLE QJsonArray listGroupJson();
-    Q_INVOKABLE void addGroupJson(QJsonValue json);
+    Q_INVOKABLE QJsonObject addGroupJson(QJsonValue json);
     Q_INVOKABLE void removeGroup(int index);
     Q_INVOKABLE void addActor(QJsonObject json);
     Q_INVOKABLE QJsonArray getGroupActors(QString group);
@@ -191,10 +191,10 @@ public slots:
     Q_INVOKABLE void removeActor(QString name);
     Q_INVOKABLE void removeActors(QString groupName);
 private:
-    QSettings *settings;
     QMap<QString, CActor *> actorMap;
     QSqlDatabase db;
-    QSqlTableModel *dbModel;
+    QSqlTableModel *actorModel;
+    QSqlTableModel *groupModel;
 };
 
 class CActorFactory
@@ -202,7 +202,7 @@ class CActorFactory
 public:
     static CActor* create(const QString &json, QObject *parent = nullptr);
     static CActor* create(const QJsonObject &json, QObject *parent = nullptr);
-
+    static CActor* create(const QSqlRecord &record, QObject *parent = nullptr);
 private:
     static CActor *newActor(const QString &type, QObject *parent = nullptr);
 };

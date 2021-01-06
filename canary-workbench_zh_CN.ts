@@ -17,12 +17,12 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="cactor.cpp" line="153"/>
+        <location filename="cactor.cpp" line="166"/>
         <source>Cannot open database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="cactor.cpp" line="154"/>
+        <location filename="cactor.cpp" line="167"/>
         <source>Unable to establish a database connection.
 This example needs SQLite support. Please read the Qt SQL driver documentation for information how to build it.
 
@@ -33,22 +33,22 @@ Click Cancel to exit.</source>
 <context>
     <name>WorkBox</name>
     <message>
-        <location filename="WorkBox.qml" line="205"/>
+        <location filename="WorkBox.qml" line="208"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="216"/>
+        <location filename="WorkBox.qml" line="219"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="222"/>
+        <location filename="WorkBox.qml" line="225"/>
         <source>Clear All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="263"/>
+        <location filename="WorkBox.qml" line="266"/>
         <source>Add...</source>
         <translation type="unfinished"></translation>
     </message>

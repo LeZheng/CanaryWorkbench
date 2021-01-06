@@ -125,6 +125,28 @@ CActor *CActorFactory::create(const QJsonObject &jsonObj, QObject *parent)
     }
 }
 
+CActor *CActorFactory::create(const QSqlRecord &record, QObject *parent)
+{
+    if (record.isEmpty()) {
+        return nullptr;
+    } else {
+        auto typeValue = record.value("type");
+        if (!typeValue.isValid() || typeValue.isNull()) {
+            return nullptr;
+        } else {
+            auto actor = newActor(typeValue.toString(),parent);
+            auto metaObj = actor->metaObject();
+            for(int i = 0; i < record.count(); i++) {
+                auto field = record.field(i);
+                if (metaObj->indexOfProperty(field.name().toUtf8()) >= 0) {
+                    actor->setProperty(field.name().toUtf8(), field.value());
+                }
+            }
+            return actor;
+        }
+    }
+}
+
 CActor *CActorFactory::newActor(const QString &type, QObject *parent)
 {
     if (type == "cmd") {//TODO use map
@@ -138,15 +160,6 @@ CActorGroup::CActorGroup(QObject *parent) : QObject(parent) {}
 
 ActorModel::ActorModel(QObject *parent)
 {
-    this->settings = new QSettings("Actor Settings", QSettings::IniFormat, this);
-    auto actorArray = this->settings->value("actor-list").toJsonArray();
-    foreach (auto actorValue, actorArray) {
-        auto actor = CActorFactory::create(actorValue.toObject());
-        if (actor) {
-            actorMap.insert(actor->id(), actor);
-        }
-    }
-//------------------
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("CanaryData.db");
     if (!db.open()) {
@@ -156,15 +169,30 @@ ActorModel::ActorModel(QObject *parent)
                                           "the Qt SQL driver documentation for information how "
                                           "to build it.\n\n"
                                           "Click Cancel to exit."), QMessageBox::Cancel);
+        qWarning() << "Cannot open database";
         return;
     }
     QStringList tables = db.tables();
-    if(!tables.contains("Actor")) {
+    if(!tables.contains("c_group")) {
+        QSqlQuery q(db);
+        bool r = q.exec("CREATE TABLE c_group ("
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "name TEXT "
+                        ")");
+
+        qDebug() << r << " - " << q.lastError();
+    }
+    groupModel = new QSqlTableModel(this, db);
+    groupModel->setTable("c_group");
+    groupModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    groupModel->select();
+
+    if(!tables.contains("c_actor")) {
         QSqlQuery query;
-        bool r = query.exec("CREATE TABLE Actor ("
+        bool r = query.exec("CREATE TABLE c_actor ("
                             "id INTEGER PRIMARY KEY  AUTOINCREMENT, "
                             "type TEXT, "
-                            "groupName TEXT, "
+                            "groupId TEXT, "
                             "name TEXT, "
                             "form TEXT, "
                             "description TEXT, "
@@ -174,10 +202,10 @@ ActorModel::ActorModel(QObject *parent)
             qDebug() << query.lastError();
 
     }
-    dbModel = new QSqlTableModel(this, db);
-    dbModel->setTable("Actor");
-    dbModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    dbModel->select();
+    actorModel = new QSqlTableModel(this, db);
+    actorModel->setTable("c_actor");
+    actorModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    actorModel->select();
 }
 
 CActor *ActorModel::getActor(const QString &id)
@@ -187,32 +215,50 @@ CActor *ActorModel::getActor(const QString &id)
 
 QJsonArray ActorModel::listGroupJson()
 {
-    return this->settings->value("group-list").toJsonArray();
+    QJsonArray array;
+    for(int i = 0; i < groupModel->rowCount(); i++) {
+        QSqlRecord r = groupModel->record(i);
+        array.append(QJsonObject {
+            {"id", r.value("id").toString()},
+            {"name", r.value("name").toString()}
+        });
+    }
+    return array;
 }
 
-void ActorModel::addGroupJson(QJsonValue json)
+QJsonObject ActorModel::addGroupJson(QJsonValue json)
 {
-    auto array = settings->value("group-list").toJsonArray();
-    array.append(json);
-    settings->setValue("group-list", array);
+    QSqlRecord groupRecord;
+
+    QSqlField f("id", QVariant::Int);
+    f.setAutoValue(true);
+    f.setGenerated(true);
+    groupRecord.append(f);
+
+    QSqlField nameField("name", QVariant::Int);
+    nameField.setValue(json.toObject().value("name").toString("unknown"));
+    groupRecord.append(nameField);
+
+    groupModel->insertRecord(-1, groupRecord);
+    groupModel->submitAll();
+
+    auto r = groupModel->record(groupModel->rowCount() - 1);
+    return QJsonObject{
+        {"id", r.value("id").toString()},
+        {"name", r.value("name").toString()}
+    };
 }
 
 void ActorModel::removeGroup(int index)
 {
-    auto array = settings->value("group-list").toJsonArray();
-    array.removeAt(index);
-    settings->setValue("group-list", array);
+    groupModel->removeRow(index);
+    groupModel->submitAll();
 }
 
 void ActorModel::addActor(QJsonObject json)
 {
     auto actor = CActorFactory::create(json, this);
     if (actor) {
-        actorMap.insert(actor->name(), actor);
-        auto actorArray = this->settings->value("actor-list").toJsonArray();
-        actorArray.append(json);
-        this->settings->setValue("actor-list", actorArray);
-
         QSqlRecord r;
         auto idf = QSqlField("id", QVariant::Int);
         idf.setAutoValue(true);
@@ -223,52 +269,58 @@ void ActorModel::addActor(QJsonObject json)
             f.setValue(v);
             r.append(f);
         }
-        bool s = dbModel->insertRecord(-1, r);
-        dbModel->submitAll();
+        bool s = actorModel->insertRecord(-1, r);
+        actorModel->submitAll();
     }
 }
 
 QJsonArray ActorModel::getGroupActors(QString group)
 {
+    actorMap.clear();
     QJsonArray array;
-    auto actorArray = this->settings->value("actor-list").toJsonArray();
-    foreach (auto actor, actorArray) {
-        if (actor.toObject().value("group").toString() == group) {
-            array.append(actor);
+    actorModel->setFilter(QString("groupId=%1").arg(group.toInt(0)));
+    actorModel->select();
+    for(int i = 0; i < actorModel->rowCount(); i++) {
+        auto r = actorModel->record(i);
+        QJsonObject a;
+        for(int j = 0; j < r.count(); j++) {
+            auto f = r.field(j);
+            a.insert(f.name(), f.value().toString());
+        }
+        array.append(a);
+
+        auto actor = CActorFactory::create(r, this);
+        if(actor != nullptr) {
+            actorMap.insert(actor->id(), actor);
         }
     }
     return array;
 }
 
-void ActorModel::removeActor(QString name)
+void ActorModel::removeActor(QString id)
 {
-    auto actor = actorMap.take(name);
+    auto actor = actorMap.take(id);
     if (actor) {
         actor->deleteLater();
     }
-    auto actorArray = this->settings->value("actor-list").toJsonArray();
-    for (int i = 0; i < actorArray.size(); i++) {
-        if (name == actorArray.at(i).toObject().value("name").toString()) {
-            actorArray.removeAt(i);
+
+    for(int i = 0; i< actorModel->rowCount(); i++) {
+        if(actorModel->record(i).value("id").toString() == id) {
+            actorModel->removeRow(i);
             break;
         }
     }
-    this->settings->setValue("actor-list", actorArray);
+    actorModel->submitAll();
 }
 
-void ActorModel::removeActors(QString groupName)
+void ActorModel::removeActors(QString groupId)
 {
-    auto actorArray = this->settings->value("actor-list").toJsonArray();
-    QJsonArray newArray;
-    foreach (auto actor, actorArray) {
-        if (actor.toObject().value("group") != groupName) {
-            newArray.append(actor);
-        } else {
-            auto a = actorMap.take(actor.toObject().value("name").toString());
-            a->deleteLater();
-        }
-    }
-    this->settings->setValue("actor-list", newArray);
+    db.transaction();
+    actorModel->setFilter(QString("groupId=%1").arg(groupId));
+    actorModel->select();
+    actorModel->removeRows(0, actorModel->rowCount());
+    actorModel->submitAll();
+    db.commit();
 }
 
 CmdActor::CmdActor(QObject *parent):CActor(parent)

@@ -4,6 +4,7 @@
 #include <QMetaMethod>
 #include <QDebug>
 #include <cactor.h>
+#include <QMessageBox>
 
 Workspace::Workspace(const QString &name,QObject *parent):QObject(parent),mName(name)
 {
@@ -35,11 +36,11 @@ QQmlListProperty<Pipe> Workspace::pipeList()
 QQmlListProperty<ActorItem> Workspace::actorList()
 {
     return QQmlListProperty<ActorItem>(this,
-                                  this,
-                                  &Workspace::appendActor,
-                                  &Workspace::actorCount,
-                                  &Workspace::actorAt,
-                                  &Workspace::clearActors);
+                                       this,
+                                       &Workspace::appendActor,
+                                       &Workspace::actorCount,
+                                       &Workspace::actorAt,
+                                       &Workspace::clearActors);
 }
 
 void Workspace::appendPipe(Pipe *pipe)
@@ -87,7 +88,7 @@ QJsonObject Workspace::toJson()
     QJsonObject spaceJson;
     spaceJson.insert("name", name());
     QJsonArray actorArray;
-    foreach (auto actor , mActorList) {
+    foreach (auto actor, mActorList) {
         QJsonObject actorJson;
         actorJson.insert("x", actor->x());
         actorJson.insert("y", actor->y());
@@ -100,7 +101,7 @@ QJsonObject Workspace::toJson()
     spaceJson.insert("actorList", actorArray);
 
     QJsonArray pipeArray;
-    foreach (auto pipe , mPipeList) {
+    foreach (auto pipe, mPipeList) {
         QJsonObject pipeJson;
         pipeJson.insert("inputId", pipe->inputId());
         pipeJson.insert("outputId", pipe->outputId());
@@ -158,12 +159,12 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
     this->settings = new QSettings("Workspace Settings", QSettings::IniFormat, this);
     auto spaceArray = settings->value("space-list").toJsonArray();
     foreach (auto space, spaceArray) {
-        auto w = new Workspace(space.toObject().value("name").toString() ,this);
+        auto w = new Workspace(space.toObject().value("name").toString(),this);
         auto actorArray = space.toObject().value("actorList").toArray();
         foreach (auto actorJson, actorArray) {
             auto actor = new ActorItem(w);
             auto json = actorJson.toObject();
-            foreach (auto key , json.keys()) {
+            foreach (auto key, json.keys()) {
                 actor->setProperty(key.toStdString().data(), json.value(key));
             }
             w->appendActor(actor);
@@ -172,7 +173,7 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
         foreach (auto pipeJson, pipeArray) {
             auto pipe = new Pipe(w);
             auto json = pipeJson.toObject();
-            foreach (auto key , json.keys()) {
+            foreach (auto key, json.keys()) {
                 pipe->setProperty(key.toStdString().data(), json.value(key));
             }
             w->appendPipe(pipe);
@@ -181,6 +182,72 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
         workspaceMap.insert(w->name(), w);
     }
     QJsonDocument d(spaceArray);
+
+    //-------------------------------
+    if(QSqlDatabase::contains()) {
+        db = QSqlDatabase::database();
+    } else {
+        db = QSqlDatabase::addDatabase("QSQLITE");
+    }
+
+    db.setDatabaseName("CanaryData.db");
+    if (!db.open()) {
+        QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
+                              QObject::tr("Unable to establish a database connection.\n"
+                                          "This example needs SQLite support. Please read "
+                                          "the Qt SQL driver documentation for information how "
+                                          "to build it.\n\n"
+                                          "Click Cancel to exit."), QMessageBox::Cancel);
+        qWarning() << "Cannot open database";
+        return;
+    }
+
+    QStringList tables = db.tables();
+    if(!tables.contains("c_workspace")) {
+        QSqlQuery q(db);
+        bool r = q.exec("CREATE TABLE c_workspace ("
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "name TEXT "
+                        ")");
+        qDebug() << r << " - " << q.lastError();
+    }
+    spaceModel = new QSqlTableModel(this, db);
+    spaceModel->setTable("c_workspace");
+    spaceModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    spaceModel->select();
+
+    if(!tables.contains("c_pipe_item")) {
+        QSqlQuery q(db);
+        bool r = q.exec("CREATE TABLE c_pipe_item ("
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "inputId TEXT, "
+                        "outputId Text, "
+                        "signalName Text, "
+                        "slotName Text "
+                        ")");
+        qDebug() << r << " - " << q.lastError();
+    }
+    pipeItemModel = new QSqlTableModel(this, db);
+    pipeItemModel->setTable("c_pipe_item");
+    pipeItemModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    pipeItemModel->select();
+
+    if(!tables.contains("c_actor_item")) {
+        QSqlQuery q(db);
+        bool r = q.exec("CREATE TABLE c_actor_item ("
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "actorId TEXT, "
+                        "x INTEGER, "
+                        "y INTEGER, "
+                        "width INTEGER, "
+                        "height INTEGER "
+                        ")");
+        qDebug() << r << " - " << q.lastError();
+    }
+    actorItemModel = new QSqlTableModel(this, db);
+    actorItemModel->setTable("c_actor_item");
+    actorItemModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    actorItemModel->select();
 }
 
 QJsonArray WorkspaceModel::listJson()
@@ -195,7 +262,7 @@ QQmlListProperty<Workspace> WorkspaceModel::list()
 
 void WorkspaceModel::addJson(QJsonValue json)
 {
-    if(json.isObject()){
+    if(json.isObject()) {
         auto spaceJson = json.toObject();
         auto w = new Workspace(spaceJson.value("name").toString(), this);
         workspaceMap.insert(w->name(), w);
@@ -207,7 +274,7 @@ void WorkspaceModel::addJson(QJsonValue json)
 void WorkspaceModel::remove(const QString &name)
 {
     auto w = workspaceMap.take(name);
-    if(w){
+    if(w) {
         QJsonArray spaceArray;
         foreach (auto space, workspaceMap.values()) {
             auto json = space->toJson();
@@ -226,7 +293,7 @@ Workspace *WorkspaceModel::get(const QString &name)
 ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
 {
     auto actor = new ActorItem(space);
-    foreach (auto key , json.keys()) {
+    foreach (auto key, json.keys()) {
         actor->setProperty(key.toStdString().data(), json.value(key));
     }
     auto a = actorModel->getActor(actor->actorId());

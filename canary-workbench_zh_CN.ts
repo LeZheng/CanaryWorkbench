@@ -18,11 +18,13 @@
     <name>QObject</name>
     <message>
         <location filename="cactor.cpp" line="166"/>
+        <location filename="workspace.cpp" line="195"/>
         <source>Cannot open database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="cactor.cpp" line="167"/>
+        <location filename="workspace.cpp" line="196"/>
         <source>Unable to establish a database connection.
 This example needs SQLite support. Please read the Qt SQL driver documentation for information how to build it.
 

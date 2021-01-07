@@ -8,6 +8,7 @@
 #include "cactor.h"
 #include <QDebug>
 
+#include <QtSql>
 
 class Pipe : public QObject
 {
@@ -38,18 +39,22 @@ public:
     {
         return mOutputId;
     }
-    void setSignalName(const QString &sName){
+    void setSignalName(const QString &sName)
+    {
         mSignalName = sName;
         emit signalNameChanged(mSignalName);
     }
-    QString signalName(){
+    QString signalName()
+    {
         return mSignalName;
     }
-    void setSlotName(const QString &sName){
+    void setSlotName(const QString &sName)
+    {
         mSlotName = sName;
         emit slotNameChanged(mSlotName);
     }
-    QString slotName(){
+    QString slotName()
+    {
         return mSlotName;
     }
 
@@ -85,49 +90,69 @@ public:
         this->mId = id;
         emit idChanged(mId);
     }
-    QString id() { return mId; }
+    QString id()
+    {
+        return mId;
+    }
 
     void setActorId(const QString &id)
     {
         this->mActorId = id;
         emit actorIdChanged(mActorId);
     }
-    QString actorId() { return mActorId; }
+    QString actorId()
+    {
+        return mActorId;
+    }
 
-    void setX(int x){
+    void setX(int x)
+    {
         this->mX = x;
         emit xChanged(mX);
     }
-    int x(){
+    int x()
+    {
         return mX;
     }
-    void setY(int y){
+    void setY(int y)
+    {
         this->mY = y;
         emit yChanged(mY);
     }
-    int y(){
+    int y()
+    {
         return mY;
     }
 
-    void setHeight(int height){
+    void setHeight(int height)
+    {
         this->mHeight = height;
         emit heightChanged(mHeight);
     }
-    int height(){
+    int height()
+    {
         return mHeight;
     }
 
-    void setWidth(int width){
+    void setWidth(int width)
+    {
         this->mWidth = width;
         emit widthChanged(mWidth);
     }
 
-    int width() { return mWidth; }
-
-    void setImpl( CActor *a) { this->mActor = a;
+    int width()
+    {
+        return mWidth;
     }
 
-    CActor *impl() { return mActor;
+    void setImpl( CActor *a)
+    {
+        this->mActor = a;
+    }
+
+    CActor *impl()
+    {
+        return mActor;
     }
 
 private:
@@ -224,6 +249,10 @@ private:
     QList<Workspace *> workspaceList;
     QMap<QString, Workspace*> workspaceMap;
     ActorModel *actorModel;
+    QSqlDatabase db;
+    QSqlTableModel *spaceModel;
+    QSqlTableModel *pipeItemModel;
+    QSqlTableModel *actorItemModel;
 };
 
 #endif // WORKSPACE_H

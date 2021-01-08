@@ -8,7 +8,7 @@ Frame {
     width: 400
     height: 400
 
-    signal workbenchOpenRequested(string name)
+    signal workbenchOpenRequested(var space)
 
     property var currentItem: null
     property alias currentIndex: listView.currentIndex
@@ -61,7 +61,7 @@ Frame {
                     }
                 }
 
-                onDoubleClicked: root.workbenchOpenRequested(name)
+                onDoubleClicked: root.workbenchOpenRequested(spaceListModel.get(index))
             }
         }
 
@@ -107,7 +107,7 @@ Frame {
                 var item = {
                     "name": wsNameText.text
                 }
-                workspaceModel.addJson(item)
+                item = workspaceModel.addJson(item)
                 spaceListModel.append(item)
             }
         }
@@ -149,7 +149,7 @@ Frame {
         text: "Remove"
         onTriggered: {
             let data = spaceListModel.data(itemMenu.spaceIndex)
-            workspaceModel.remove(data.name)
+            workspaceModel.remove(data.id)
             spaceListModel.remove(itemMenu.spaceIndex)
         }
     }
@@ -166,9 +166,6 @@ Frame {
     Component.onCompleted: {
         var list = workspaceModel.listJson()
         spaceListModel.clear()
-
-        //        var x = workspaceModel.list()
-        //        console.log("loaded:", x)
         list.forEach(function (w) {
             spaceListModel.append(w)
         })

@@ -14,6 +14,8 @@ class Pipe : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString mId READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(QString spaceId READ spaceId WRITE setSpaceId NOTIFY spaceIdChanged)
     Q_PROPERTY(QString inputId READ inputId WRITE setInputId NOTIFY inputIdChanged)
     Q_PROPERTY(QString outputId READ outputId WRITE setOutputId NOTIFY outputIdChanged)
     Q_PROPERTY(QString signalName READ signalName WRITE setSignalName NOTIFY signalNameChanged)
@@ -58,17 +60,44 @@ public:
         return mSlotName;
     }
 
+    void setId(const QString &id)
+    {
+        mId = id;
+        emit idChanged(mId);
+    }
+    QString id()
+    {
+        return mId;
+    }
+
+    void setSpaceId(const QString &i)
+    {
+        mSpaceId = i;
+        emit spaceIdChanged(mSpaceId);
+    }
+
+    QString spaceId()
+    {
+        return mSpaceId;
+    }
+
+    QSqlRecord toRecord();
+
 private:
     QString mInputId;
     QString mOutputId;
     QString mSignalName;
     QString mSlotName;
+    QString mId;
+    QString mSpaceId;
 
 signals:
     void inputIdChanged(QString inputId);
     void outputIdChanged(QString inputId);
     void signalNameChanged(QString signalName);
     void slotNameChanged(QString slotName);
+    void idChanged(QString id);
+    void spaceIdChanged(QString spaceId);
 };
 
 class ActorItem : public QObject
@@ -76,6 +105,7 @@ class ActorItem : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(QString spaceId READ spaceId WRITE setSpaceId NOTIFY spaceIdChanged)
     Q_PROPERTY(QString actorId READ actorId WRITE setActorId NOTIFY actorIdChanged)
     Q_PROPERTY(int x READ x WRITE setX NOTIFY xChanged)
     Q_PROPERTY(int y READ y WRITE setY NOTIFY yChanged)
@@ -155,8 +185,22 @@ public:
         return mActor;
     }
 
+    void setSpaceId(const QString &i)
+    {
+        mSpaceId = i;
+        emit spaceIdChanged(mSpaceId);
+    }
+
+    QString spaceId()
+    {
+        return mSpaceId;
+    }
+
+    QSqlRecord toRecord();
+
 private:
     QString mId;
+    QString mSpaceId;
     QString mActorId;
     int mX;
     int mY;
@@ -171,12 +215,14 @@ signals:
     void yChanged(int y);
     void widthChanged(int width);
     void heightChanged(int height);
+    void spaceIdChanged(QString spaceId);
 };
 
 class Workspace:public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QQmlListProperty<Pipe> pipeList READ pipeList)
     Q_PROPERTY(QQmlListProperty<ActorItem> actorList READ actorList)
@@ -192,7 +238,18 @@ public:
     void setName(const QString &name)
     {
         mName = name;
+        emit nameChanged(mName);
     }
+    QString id()
+    {
+        return mId;
+    }
+    void setId(const QString &i)
+    {
+        mId = i;
+        emit idChanged(mId);
+    }
+
     QQmlListProperty<Pipe> pipeList();
 
     QQmlListProperty<ActorItem> actorList();
@@ -209,6 +266,7 @@ public:
     QJsonObject toJson();
 
 private:
+    QString mId;
     QString mName;
     QList<Pipe *> mPipeList;
     QList<ActorItem *> mActorList;
@@ -225,6 +283,7 @@ private:
     static void clearActors(QQmlListProperty<ActorItem> *);
 signals:
     void nameChanged(QString name);
+    void idChanged(QString id);
 };
 
 class WorkspaceModel:public QObject
@@ -236,8 +295,7 @@ public:
 
 public slots:
     Q_INVOKABLE QJsonArray listJson();
-    Q_INVOKABLE QQmlListProperty<Workspace> list();
-    Q_INVOKABLE void addJson(QJsonValue json);
+    Q_INVOKABLE QJsonValue addJson(QJsonValue json);
     Q_INVOKABLE void remove(const QString &name);
     Q_INVOKABLE Workspace* get(const QString &name);
     Q_INVOKABLE ActorItem* addActor( Workspace *space,QJsonObject json);
@@ -246,7 +304,6 @@ public slots:
 
 private:
     QSettings *settings;
-    QList<Workspace *> workspaceList;
     QMap<QString, Workspace*> workspaceMap;
     ActorModel *actorModel;
     QSqlDatabase db;

@@ -12,7 +12,7 @@ Pane {
     clip: true
 
     property string colorKey
-    property string name
+    property string id
     property Workspace workspace
     property var actorFormMap: Object()
 
@@ -186,7 +186,7 @@ Pane {
     }
 
     Component.onCompleted: {
-        workspace = workspaceModel.get(name)
+        workspace = workspaceModel.get(id)
         for (var i = 0; i < workspace.actorList.length; i++) {
             addActor(workspace.actorList[i])
         }

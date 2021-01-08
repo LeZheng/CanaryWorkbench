@@ -157,31 +157,6 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
 {
     this->actorModel = m;
     this->settings = new QSettings("Workspace Settings", QSettings::IniFormat, this);
-    auto spaceArray = settings->value("space-list").toJsonArray();
-    foreach (auto space, spaceArray) {
-        auto w = new Workspace(space.toObject().value("name").toString(),this);
-        auto actorArray = space.toObject().value("actorList").toArray();
-        foreach (auto actorJson, actorArray) {
-            auto actor = new ActorItem(w);
-            auto json = actorJson.toObject();
-            foreach (auto key, json.keys()) {
-                actor->setProperty(key.toStdString().data(), json.value(key));
-            }
-            w->appendActor(actor);
-        }
-        auto pipeArray = space.toObject().value("pipeList").toArray();
-        foreach (auto pipeJson, pipeArray) {
-            auto pipe = new Pipe(w);
-            auto json = pipeJson.toObject();
-            foreach (auto key, json.keys()) {
-                pipe->setProperty(key.toStdString().data(), json.value(key));
-            }
-            w->appendPipe(pipe);
-        }
-        workspaceList.append(w);
-        workspaceMap.insert(w->name(), w);
-    }
-    QJsonDocument d(spaceArray);
 
     //-------------------------------
     if(QSqlDatabase::contains()) {
@@ -220,6 +195,7 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
         QSqlQuery q(db);
         bool r = q.exec("CREATE TABLE c_pipe_item ("
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "spaceId id, "
                         "inputId TEXT, "
                         "outputId Text, "
                         "signalName Text, "
@@ -236,6 +212,7 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
         QSqlQuery q(db);
         bool r = q.exec("CREATE TABLE c_actor_item ("
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "spaceId id, "
                         "actorId TEXT, "
                         "x INTEGER, "
                         "y INTEGER, "
@@ -252,42 +229,94 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
 
 QJsonArray WorkspaceModel::listJson()
 {
-    return settings->value("space-list").toJsonArray();
-}
-
-QQmlListProperty<Workspace> WorkspaceModel::list()
-{
-    return QQmlListProperty<Workspace>(this, workspaceList);
-}
-
-void WorkspaceModel::addJson(QJsonValue json)
-{
-    if(json.isObject()) {
-        auto spaceJson = json.toObject();
-        auto w = new Workspace(spaceJson.value("name").toString(), this);
-        workspaceMap.insert(w->name(), w);
-
-        save(spaceJson);
+    QJsonArray array;
+    for(int i = 0; i < spaceModel->rowCount(); i++) {
+        auto r = spaceModel->record(i);
+        array.append(QJsonObject{
+            {"id", r.value("id").toString()},
+            {"name", r.value("name").toString()}
+        });
     }
+
+    return array;
 }
 
-void WorkspaceModel::remove(const QString &name)
+QJsonValue WorkspaceModel::addJson(QJsonValue json)
 {
-    auto w = workspaceMap.take(name);
+    QSqlRecord r;
+    QSqlField idField("id", QVariant::Int);
+    idField.setAutoValue(true);
+    idField.setGenerated(true);
+    QSqlField nameField("name", QVariant::String);
+    auto name = json.toObject().value("name").toString();
+    nameField.setValue(name);
+    r.append(idField);
+    r.append(nameField);
+    spaceModel->insertRecord(-1, r);
+    spaceModel->submitAll();
+
+    QSqlRecord record = spaceModel->record(spaceModel->rowCount() - 1);
+    auto w = new Workspace(name, this);
+    w->setId(record.value("id").toString());
+    workspaceMap.insert(w->id(), w);
+
+    return w->toJson();
+}
+
+void WorkspaceModel::remove(const QString &id)
+{
+    auto w = workspaceMap.take(id);
     if(w) {
-        QJsonArray spaceArray;
-        foreach (auto space, workspaceMap.values()) {
-            auto json = space->toJson();
-            spaceArray.append(json);
-        }
         w->deleteLater();
-        settings->setValue("space-list", spaceArray);
     }
+
+    db.transaction();
+    for(int i = 0; i < spaceModel->rowCount(); i++) {
+        if(spaceModel->record(i).value("id").toString() == id) {
+            spaceModel->removeRow(i);
+            spaceModel->submitAll();
+            break;
+        }
+    }
+
+    for(int i = 0; i < pipeItemModel->rowCount(); i++) {
+        if(pipeItemModel->record(i).value("spaceId").toString() == id) {
+            pipeItemModel->removeRow(i);
+            pipeItemModel->submitAll();
+            break;
+        }
+    }
+
+    for(int i = 0; i < actorItemModel->rowCount(); i++) {
+        if(actorItemModel->record(i).value("spaceId").toString() == id) {
+            actorItemModel->removeRow(i);
+            actorItemModel->submitAll();
+            break;
+        }
+    }
+    db.commit();
 }
 
-Workspace *WorkspaceModel::get(const QString &name)
+Workspace *WorkspaceModel::get(const QString &id)
 {
-    return workspaceMap.value(name);
+    auto w = workspaceMap.value(id, nullptr);
+    if(w != nullptr) {
+        return w;
+    } else {
+        QSqlQuery q(db);
+        q.prepare("SELECT * FROM c_workspace WHERE id=?");
+        q.bindValue(0, id);
+        q.exec();
+        auto r = q.record();
+        if(!r.isEmpty()) {
+            w = new Workspace(r.value("name").toString(), this);
+            w->setId(r.value("id").toString());
+            workspaceMap.insert(id, w);
+            return w;
+        } else {
+            return nullptr;
+        }
+    }
 }
 
 ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
@@ -296,11 +325,16 @@ ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
     foreach (auto key, json.keys()) {
         actor->setProperty(key.toStdString().data(), json.value(key));
     }
+    actor->setSpaceId(space->id());
     auto a = actorModel->getActor(actor->actorId());
     if (a) {
         actor->setImpl(a->clone(actor));
     }
     space->appendActor(actor);
+
+    actorItemModel->insertRecord(-1, actor->toRecord());
+    actorItemModel->submitAll();
+
     return actor;
 }
 
@@ -310,7 +344,11 @@ Pipe *WorkspaceModel::addPipe(Workspace *space, QJsonObject json)
     foreach (auto key, json.keys()) {
         pipe->setProperty(key.toStdString().data(), json.value(key));
     }
+    pipe->setSpaceId(space->id());
     space->appendPipe(pipe);
+
+    pipeItemModel->insertRecord(-1, pipe->toRecord());
+
     return pipe;
 }
 
@@ -328,4 +366,36 @@ Pipe::Pipe(QObject *parent):QObject(parent)
 
 }
 
+QSqlField field(const QString &key, QVariant::Type type, QVariant value)
+{
+    QSqlField f(key, type);
+    f.setValue(value);
+    return f;
+}
+
+QSqlRecord Pipe::toRecord()
+{
+    QSqlRecord r;
+    r.append(field("id",QVariant::Int, id()));
+    r.append(field("spaceId",QVariant::String, spaceId()));
+    r.append(field("inputId",QVariant::String, inputId()));
+    r.append(field("outputId",QVariant::String, outputId()));
+    r.append(field("slotName",QVariant::String, slotName()));
+    r.append(field("signalName",QVariant::String, signalName()));
+    return r;
+}
+
 ActorItem::ActorItem(QObject *parent) : QObject(parent) {}
+
+QSqlRecord ActorItem::toRecord()
+{
+    QSqlRecord r;
+    r.append(field("id", QVariant::Int, id()));
+    r.append(field("spaceId", QVariant::String, spaceId()));
+    r.append(field("actorId", QVariant::String, actorId()));
+    r.append(field("x", QVariant::Int, x()));
+    r.append(field("y", QVariant::Int, y()));
+    r.append(field("height", QVariant::Int, height()));
+    r.append(field("width", QVariant::Int, width()));
+    return r;
+}

@@ -96,18 +96,19 @@ ApplicationWindow {
 
             onWorkbenchOpenRequested: {
                 for (var i = 0; i < workbenchTabs.count; i++) {
-                    if (workbenchTabs.itemAt(i).text === name) {
+                    if (workbenchTabs.itemAt(i).text === space.name) {
                         workbenchTabs.currentIndex = i
                         return
                     }
                 }
 
                 var tab = tabComponent.createObject(workbenchTabs, {
-                                                        "text": name
+                                                        "text": space.name
                                                     })
                 var workbench = workbenchComponent.createObject(
                             workbenchLayouts, {
-                                "name": name
+                                "name": space.name,
+                                "id":space.id,
                             })
             }
         }

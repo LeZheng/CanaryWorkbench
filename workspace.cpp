@@ -25,71 +25,23 @@ Workspace* Workspace::fromJson(const QString &jsonStr)
 
 QQmlListProperty<Pipe> Workspace::pipeList()
 {
-    return QQmlListProperty<Pipe>(this,
-                                  this,
-                                  &Workspace::appendPipe,
-                                  &Workspace::pipeCount,
-                                  &Workspace::pipeAt,
-                                  &Workspace::clearPipes);
+    return QQmlListProperty<Pipe>(this,mPipeList);
 }
 
 QQmlListProperty<ActorItem> Workspace::actorList()
 {
-    return QQmlListProperty<ActorItem>(this,
-                                       this,
-                                       &Workspace::appendActor,
-                                       &Workspace::actorCount,
-                                       &Workspace::actorAt,
-                                       &Workspace::clearActors);
-}
-
-void Workspace::appendPipe(Pipe *pipe)
-{
-    mPipeList.append(pipe);
-}
-
-int Workspace::pipeCount() const
-{
-    return mPipeList.count();
-}
-
-Pipe *Workspace::pipeAt(int idx) const
-{
-    return mPipeList.at(idx);
-}
-
-void Workspace::clearPipes()
-{
-    mPipeList.clear();
-}
-
-void Workspace::appendActor(ActorItem *actor)
-{
-    mActorList.append(actor);
-}
-
-int Workspace::actorCount() const
-{
-    return mActorList.count();
-}
-
-ActorItem *Workspace::actorAt(int idx) const
-{
-    return mActorList.at(idx);
-}
-
-void Workspace::clearActors()
-{
-    mActorList.clear();
+    return QQmlListProperty<ActorItem>(this,mActorList);
 }
 
 QJsonObject Workspace::toJson()
 {
     QJsonObject spaceJson;
+    spaceJson.insert("id", id());
     spaceJson.insert("name", name());
     QJsonArray actorArray;
     foreach (auto actor, mActorList) {
         QJsonObject actorJson;
+        actorJson.insert("id", actor->id());
         actorJson.insert("x", actor->x());
         actorJson.insert("y", actor->y());
         actorJson.insert("width", actor->width());
@@ -103,6 +55,7 @@ QJsonObject Workspace::toJson()
     QJsonArray pipeArray;
     foreach (auto pipe, mPipeList) {
         QJsonObject pipeJson;
+        pipeJson.insert("id", pipe->id());
         pipeJson.insert("inputId", pipe->inputId());
         pipeJson.insert("outputId", pipe->outputId());
         pipeJson.insert("signalName", pipe->signalName());
@@ -111,46 +64,6 @@ QJsonObject Workspace::toJson()
     }
     spaceJson.insert("pipeList", pipeArray);
     return spaceJson;
-}
-
-void Workspace::appendPipe(QQmlListProperty<Pipe> *list, Pipe *pipe)
-{
-    reinterpret_cast<Workspace *>(list->data)->appendPipe(pipe);
-}
-
-int Workspace::pipeCount(QQmlListProperty<Pipe> *list)
-{
-    return reinterpret_cast<Workspace *>(list->data)->pipeCount();
-}
-
-Pipe *Workspace::pipeAt(QQmlListProperty<Pipe> *list, int idx)
-{
-    return reinterpret_cast<Workspace *>(list->data)->pipeAt(idx);
-}
-
-void Workspace::clearPipes(QQmlListProperty<Pipe> *list)
-{
-    reinterpret_cast<Workspace *>(list->data)->clearPipes();
-}
-
-void Workspace::appendActor(QQmlListProperty<ActorItem> *list, ActorItem *actor)
-{
-    reinterpret_cast<Workspace *>(list->data)->appendActor(actor);
-}
-
-int Workspace::actorCount(QQmlListProperty<ActorItem> *list)
-{
-    return reinterpret_cast<Workspace *>(list->data)->actorCount();
-}
-
-ActorItem *Workspace::actorAt(QQmlListProperty<ActorItem> *list, int idx)
-{
-    return reinterpret_cast<Workspace *>(list->data)->actorAt(idx);
-}
-
-void Workspace::clearActors(QQmlListProperty<ActorItem> *list)
-{
-    return reinterpret_cast<Workspace *>(list->data)->clearActors();
 }
 
 WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
@@ -195,7 +108,7 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
         QSqlQuery q(db);
         bool r = q.exec("CREATE TABLE c_pipe_item ("
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        "spaceId id, "
+                        "spaceId TEXT, "
                         "inputId TEXT, "
                         "outputId Text, "
                         "signalName Text, "
@@ -212,7 +125,7 @@ WorkspaceModel::WorkspaceModel(ActorModel *m,QObject *parent):QObject(parent)
         QSqlQuery q(db);
         bool r = q.exec("CREATE TABLE c_actor_item ("
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        "spaceId id, "
+                        "spaceId TEXT, "
                         "actorId TEXT, "
                         "x INTEGER, "
                         "y INTEGER, "
@@ -307,6 +220,7 @@ Workspace *WorkspaceModel::get(const QString &id)
         q.prepare("SELECT * FROM c_workspace WHERE id=?");
         q.bindValue(0, id);
         q.exec();
+        q.next();
         auto r = q.record();
         if(!r.isEmpty()) {
             w = new Workspace(r.value("name").toString(), this);
@@ -330,7 +244,7 @@ ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
     if (a) {
         actor->setImpl(a->clone(actor));
     }
-    space->appendActor(actor);
+//    space->appendActor(actor);TODO
 
     actorItemModel->insertRecord(-1, actor->toRecord());
     actorItemModel->submitAll();
@@ -345,10 +259,10 @@ Pipe *WorkspaceModel::addPipe(Workspace *space, QJsonObject json)
         pipe->setProperty(key.toStdString().data(), json.value(key));
     }
     pipe->setSpaceId(space->id());
-    space->appendPipe(pipe);
+//    space->appendPipe(pipe);TODO
 
     pipeItemModel->insertRecord(-1, pipe->toRecord());
-
+    pipeItemModel->submitAll();
     return pipe;
 }
 
@@ -359,6 +273,93 @@ void WorkspaceModel::save(const QJsonObject &json)
         spaceArray.append(space->toJson());
     }
     settings->setValue("space-list", spaceArray);
+}
+
+QJsonArray WorkspaceModel::getPipeList(const QString &spaceId)
+{
+    QJsonArray list;
+    QSqlQuery q(db);
+    q.prepare("SELECT * FROM c_pipe_item WHERE spaceId=?");
+    q.bindValue(0, spaceId);
+    q.exec();
+    while(q.next()) {
+        auto r = q.record();
+        list.append(QJsonObject{
+            {"id", r.value("id").toString()},
+            {"spaceId", r.value("spaceId").toString()},
+            {"inputId", r.value("inputId").toString()},
+            {"outputId", r.value("outputId").toString()},
+            {"signalName", r.value("signalName").toString()},
+            {"slotName", r.value("slotName").toString()}
+        });
+    }
+
+    return list;
+}
+
+QJsonArray WorkspaceModel::getActorList(const QString &spaceId)
+{
+    QJsonArray list;
+    QSqlQuery q(db);
+    q.prepare("SELECT * FROM c_actor_item WHERE spaceId=?");
+    q.bindValue(0, spaceId);
+    q.exec();
+    while(q.next()) {
+        auto r = q.record();
+        list.append(QJsonObject{
+            {"id", r.value("id").toString()},
+            {"spaceId", r.value("spaceId").toString()},
+            {"actorId", r.value("actorId").toString()},
+            {"x", r.value("x").toString()},
+            {"y", r.value("y").toString()},
+            {"width", r.value("width").toString()},
+            {"height", r.value("height").toString()}
+        });
+    }
+
+    return list;
+}
+
+Pipe *WorkspaceModel::getPipe(const QString &id)
+{
+    QSqlQuery q(db);
+    q.prepare("SELECT * FROM c_pipe_item WHERE id=?");
+    q.bindValue(0, id);
+    q.exec();
+    if(q.next()) {
+        auto r = q.record();
+        auto p = new Pipe(this);
+        for(int i= 0; i < r.count(); i++) {
+            auto field = r.field(i);
+            p->setProperty(field.name().toUtf8(), field.value());
+        }
+        return p;
+    } else {
+        return nullptr;
+    }
+}
+
+ActorItem *WorkspaceModel::getActor(const QString &id)
+{
+    QSqlQuery q(db);
+    q.prepare("SELECT * FROM c_actor_item WHERE id=?");
+    q.bindValue(0, id);
+    q.exec();
+    if(q.next()) {
+        auto r = q.record();
+        auto a = new ActorItem(this);
+        for(int i= 0; i < r.count(); i++) {
+            auto field = r.field(i);
+            a->setProperty(field.name().toUtf8(), field.value());
+        }
+        auto actor = actorModel->getActor(a->actorId());
+        if (actor) {
+            a->setImpl(actor->clone(a));
+        }
+        return a;
+    } else {
+        return nullptr;
+    }
 }
 
 Pipe::Pipe(QObject *parent):QObject(parent)

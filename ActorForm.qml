@@ -232,6 +232,7 @@ Rectangle {
     }
 
     Component.onCompleted: {
+        console.log("complete:", actorItem)
         let actor = actorItem.impl
         formRoot.form = actor.form
         formRoot.type = actor.type

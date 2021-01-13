@@ -254,15 +254,6 @@ public:
 
     QQmlListProperty<ActorItem> actorList();
 
-    void appendPipe(Pipe *pipe);
-    int pipeCount() const;
-    Pipe *pipeAt(int idx) const;
-    void clearPipes();
-
-    void appendActor(ActorItem *actor);
-    int actorCount() const;
-    ActorItem *actorAt(int idx) const;
-    void clearActors();
     QJsonObject toJson();
 
 private:
@@ -271,16 +262,6 @@ private:
     QList<Pipe *> mPipeList;
     QList<ActorItem *> mActorList;
     QSettings *mSetting;
-
-    static void appendPipe(QQmlListProperty<Pipe> *, Pipe *pipe);
-    static int pipeCount(QQmlListProperty<Pipe> *);
-    static Pipe *pipeAt(QQmlListProperty<Pipe> *,int idx);
-    static void clearPipes(QQmlListProperty<Pipe> *);
-
-    static void appendActor(QQmlListProperty<ActorItem> *, ActorItem *actor);
-    static int actorCount(QQmlListProperty<ActorItem> *);
-    static ActorItem *actorAt(QQmlListProperty<ActorItem> *,int idx);
-    static void clearActors(QQmlListProperty<ActorItem> *);
 signals:
     void nameChanged(QString name);
     void idChanged(QString id);
@@ -299,9 +280,12 @@ public slots:
     Q_INVOKABLE void remove(const QString &name);
     Q_INVOKABLE Workspace* get(const QString &name);
     Q_INVOKABLE ActorItem* addActor( Workspace *space,QJsonObject json);
-    Q_INVOKABLE Pipe *addPipe(Workspace *space, QJsonObject json);
+    Q_INVOKABLE Pipe* addPipe(Workspace *space, QJsonObject json);
     Q_INVOKABLE void save(const QJsonObject &json);
-
+    Q_INVOKABLE QJsonArray getPipeList(const QString &spaceId);
+    Q_INVOKABLE QJsonArray getActorList(const QString &spaceId);
+    Q_INVOKABLE Pipe * getPipe(const QString &id);
+    Q_INVOKABLE ActorItem * getActor(const QString &id);
 private:
     QSettings *settings;
     QMap<QString, Workspace*> workspaceMap;

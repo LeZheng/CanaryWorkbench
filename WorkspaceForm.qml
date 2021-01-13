@@ -124,6 +124,7 @@ Pane {
     }
 
     function addActor(actor) {
+        actor = workspaceModel.getActor(actor.id)
         var form = actorComponent.createObject(destArea, {
                                                    "actorItem": actor
                                                })
@@ -135,6 +136,7 @@ Pane {
     }
 
     function addPipe(pipe) {
+        pipe = workspaceModel.getPipe(pipe.id)
         let source = root.actorFormMap[pipe.inputId]
         let target = root.actorFormMap[pipe.outputId]
         var pipeForm = pipeComponent.createObject(destArea, {
@@ -187,11 +189,14 @@ Pane {
 
     Component.onCompleted: {
         workspace = workspaceModel.get(id)
-        for (var i = 0; i < workspace.actorList.length; i++) {
-            addActor(workspace.actorList[i])
+        let actorList = workspaceModel.getActorList(workspace.id)
+        for (let i = 0; i < actorList.length; i++) {
+            addActor(actorList[i])
         }
-        for (var i = 0; i < workspace.pipeList.length; i++) {
-            addPipe(workspace.pipeList[i])
+        let pipeList = workspaceModel.getPipeList(workspace.id)
+        for (let i = 0; i < pipeList.length; i++) {
+            addPipe(pipeList[i])
         }
+        console.log("workspaceForm complete:", workspace.id, JSON.stringify(actorList), pipeList)
     }
 }

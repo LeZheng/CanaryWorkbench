@@ -29,15 +29,31 @@ Frame {
         model: ListModel {
             id: spaceListModel
         }
-        delegate: Item {
+        spacing: 8
+        delegate: Frame {
             id: itemRoot
             x: 5
             width: parent.width
-            height: 40
+            height: 64
+
+            Image {
+                id: spaceIcon
+                width: 48
+                height: 48
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.leftMargin: 4
+                source: "img/ic_def_space"
+            }
 
             Text {
+                anchors.top: spaceIcon.top
+                anchors.left: spaceIcon.right
+                anchors.right: parent.right
+                anchors.margins: 8
                 text: name
-                anchors.verticalCenter: parent.verticalCenter
+                font.weight: Font.Light
                 font.bold: true
             }
             MouseArea {
@@ -61,17 +77,8 @@ Frame {
                     }
                 }
 
-                onDoubleClicked: root.workbenchOpenRequested(spaceListModel.get(index))
-            }
-        }
-
-        highlight: Rectangle {
-            color: "powderblue"
-            Behavior on y {
-                SpringAnimation {
-                    spring: 3
-                    damping: 0.2
-                }
+                onDoubleClicked: root.workbenchOpenRequested(
+                                     spaceListModel.get(index))
             }
         }
         footer: Button {
@@ -148,7 +155,7 @@ Frame {
         icon.source: "img/ic_delete"
         text: "Remove"
         onTriggered: {
-            let data = spaceListModel.data(itemMenu.spaceIndex)
+            let data = spaceListModel.get(itemMenu.spaceIndex)
             workspaceModel.remove(data.id)
             spaceListModel.remove(itemMenu.spaceIndex)
         }

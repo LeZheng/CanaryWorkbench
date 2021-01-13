@@ -23,5 +23,6 @@
         <file alias="ic_menu">img/ic_menu.svg</file>
         <file alias="ic_refresh">img/ic_refresh.png</file>
         <file alias="ic_setting">img/ic_setting.png</file>
+        <file alias="ic_def_space">img/ic_def_space.png</file>
     </qresource>
 </RCC>

@@ -195,18 +195,16 @@ void WorkspaceModel::remove(const QString &id)
     for(int i = 0; i < pipeItemModel->rowCount(); i++) {
         if(pipeItemModel->record(i).value("spaceId").toString() == id) {
             pipeItemModel->removeRow(i);
-            pipeItemModel->submitAll();
-            break;
         }
     }
+    pipeItemModel->submitAll();
 
     for(int i = 0; i < actorItemModel->rowCount(); i++) {
         if(actorItemModel->record(i).value("spaceId").toString() == id) {
             actorItemModel->removeRow(i);
-            actorItemModel->submitAll();
-            break;
         }
     }
+    actorItemModel->submitAll();
     db.commit();
 }
 

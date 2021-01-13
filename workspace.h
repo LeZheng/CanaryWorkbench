@@ -289,6 +289,8 @@ public slots:
 private:
     QSettings *settings;
     QMap<QString, Workspace*> workspaceMap;
+    QMap<QString, ActorItem*> actorItemMap;
+    QMap<QString, Pipe*> pipeItemMap;
     ActorModel *actorModel;
     QSqlDatabase db;
     QSqlTableModel *spaceModel;

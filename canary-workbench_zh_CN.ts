@@ -33,25 +33,43 @@ Click Cancel to exit.</source>
     </message>
 </context>
 <context>
+    <name>SpaceListForm</name>
+    <message>
+        <location filename="SpaceListForm.qml" line="99"/>
+        <source>Please enter workspace name</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>WorkBox</name>
     <message>
-        <location filename="WorkBox.qml" line="208"/>
+        <location filename="WorkBox.qml" line="206"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="219"/>
+        <location filename="WorkBox.qml" line="217"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="225"/>
+        <location filename="WorkBox.qml" line="223"/>
         <source>Clear All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="266"/>
+        <location filename="WorkBox.qml" line="264"/>
         <source>Add...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WorkBox.qml" line="283"/>
+        <source>Please input group name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="WorkBox.qml" line="312"/>
+        <source>Are you confirm to delete the group?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

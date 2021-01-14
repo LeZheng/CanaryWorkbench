@@ -32,16 +32,14 @@ Page {
             ToolButton {
                 id: addGroupButton
                 icon.source: "img/ic_add_group"
-                onClicked: {
-                    addGroupDialog.open()
-                }
+                onClicked: agdComponent.createObject(root).open()
             }
 
             ToolButton {
                 id: removeGroupButton
                 icon.source: "img/ic_delete"
                 enabled: groupListBox.currentText != "default"
-                onClicked: removeGroupDialog.open()
+                onClicked: rgdComponent.createObject(root).open()
             }
         }
     }
@@ -195,7 +193,7 @@ Page {
     Action {
         id: addCmdAction
         text: "Cmd"
-        onTriggered: addCmdDialog.open()
+        onTriggered: acdComponent.createObject(root).open()
     }
 
     Action {
@@ -274,102 +272,110 @@ Page {
         }
     }
 
-    Dialog {
-        id: addGroupDialog
-        width: 300
-        height: 200
-        anchors.centerIn: Overlay.overlay
+    Component {
+        id: agdComponent
+        Dialog {
+            id: addGroupDialog
+            width: 300
+            height: 200
+            anchors.centerIn: Overlay.overlay
 
-        title: "Please input group name"
-        standardButtons: Dialog.Save | Dialog.Cancel
-        parent: Overlay.overlay
-        TextField {
-            width: parent.width
-            id: groupNameText
-            selectByMouse: true
-        }
+            title: qsTr("Please input group name")
+            standardButtons: Dialog.Save | Dialog.Cancel
+            parent: Overlay.overlay
+            TextField {
+                width: parent.width
+                id: groupNameText
+                selectByMouse: true
+                focus: true
+            }
 
-        onOpened: groupNameText.text = ""
-
-        onAccepted: {
-            if (groupNameText.text.trim().length > 0) {
-                var item = {
-                    "name": groupNameText.text
+            onAccepted: {
+                if (groupNameText.text.trim().length > 0) {
+                    var item = {
+                        "name": groupNameText.text
+                    }
+                    item = actorModel.addGroupJson(item)
+                    groupListModel.append(item)
                 }
-                item = actorModel.addGroupJson(item)
-                groupListModel.append(item)
             }
         }
     }
 
-    Dialog {
-        id: removeGroupDialog
-        width: 400
-        height: 150
-        anchors.centerIn: Overlay.overlay
-        title: "Are you confirm to delete the group?"
-        standardButtons: Dialog.Yes | Dialog.No
-        parent: Overlay.overlay
+    Component {
+        id: rgdComponent
+        Dialog {
+            id: removeGroupDialog
+            width: 400
+            height: 150
+            anchors.centerIn: Overlay.overlay
+            title: qsTr("Are you confirm to delete the group?")
+            standardButtons: Dialog.Yes | Dialog.No
+            parent: Overlay.overlay
 
-        onAccepted: {
-            let index = groupListBox.currentIndex
-            let g = groupListModel.get(index)
-            actorModel.removeGroup(g.id)
-            groupListModel.remove(index)
-            groupListBox.currentIndex = index - 1
+            onAccepted: {
+                let index = groupListBox.currentIndex
+                let g = groupListModel.get(index)
+                actorModel.removeGroup(g.id)
+                groupListModel.remove(index)
+                groupListBox.currentIndex = index - 1
+            }
         }
     }
 
-    Dialog {
-        id: addCmdDialog
-        width: 400
-        anchors.centerIn: Overlay.overlay
+    Component {
+        id: acdComponent
+        Dialog {
+            id: addCmdDialog
+            width: 400
+            anchors.centerIn: Overlay.overlay
 
-        title: "Please input group name"
-        standardButtons: Dialog.Save | Dialog.Cancel
-        parent: Overlay.overlay
+            title: "Please input group name"
+            standardButtons: Dialog.Save | Dialog.Cancel
+            parent: Overlay.overlay
 
-        GridLayout {
-            anchors.fill: parent
-            columns: 2
-            Label {
-                text: "Name:"
-            }
-            TextField {
-                id: cmdNameField
-                Layout.fillWidth: true
-                selectByMouse: true
-            }
-            Label {
-                text: "Command:"
-            }
-            TextField {
-                id: cmdTextField
-                Layout.fillWidth: true
-                selectByMouse: true
-            }
-            Label {
-                text: "Description:"
-            }
-            TextField {
-                id: cmdDescField
-                Layout.fillWidth: true
-                selectByMouse: true
-            }
-        }
-
-        onAccepted: {
-            let actor = {
-                "name": cmdNameField.text,
-                "data": cmdTextField.text,
-                "groupId": groupListModel.get(groupListBox.currentIndex).id,
-                "description": cmdDescField.text,
-                "type": "cmd",
-                "form": "CmdActor.qml"
+            GridLayout {
+                anchors.fill: parent
+                columns: 2
+                Label {
+                    text: "Name:"
+                }
+                TextField {
+                    id: cmdNameField
+                    Layout.fillWidth: true
+                    selectByMouse: true
+                }
+                Label {
+                    text: "Command:"
+                }
+                TextField {
+                    id: cmdTextField
+                    Layout.fillWidth: true
+                    selectByMouse: true
+                }
+                Label {
+                    text: "Description:"
+                }
+                TextField {
+                    id: cmdDescField
+                    Layout.fillWidth: true
+                    selectByMouse: true
+                }
             }
 
-            actorModel.addActor(actor)
-            actorListModel.append(actor)
+            onAccepted: {
+                let actor = {
+                    "name": cmdNameField.text,
+                    "data": cmdTextField.text,
+                    "groupId": groupListModel.get(groupListBox.currentIndex).id,
+                    "description": cmdDescField.text,
+                    "type": "cmd",
+                    "form": "CmdActor.qml"
+                }
+
+                actorModel.addActor(actor)
+                actorListModel.append(actor)
+            }
         }
     }
 

@@ -1,6 +1,4 @@
-import QtQuick 2.0
-
-import QtQuick 2.4
+import QtQuick 2.12
 import QtQuick.Controls 2.13
 
 Frame {
@@ -90,32 +88,31 @@ Frame {
         footerPositioning: ListView.OverlayFooter
     }
 
-    Dialog {
-        id: addSpaceDialog
-        width: 300
-        height: 200
-        anchors.centerIn: Overlay.overlay
+    Component {
+        id: asdComponent
+        Dialog {
+            id: addSpaceDialog
+            width: 300
+            height: 200
+            anchors.centerIn: Overlay.overlay
 
-        title: "Please enter workspace name"
-        standardButtons: Dialog.Save | Dialog.Cancel
-        parent: Overlay.overlay
-        TextField {
-            width: parent.width
-            id: wsNameText
-            selectByMouse: true
-        }
+            title: qsTr("Please enter workspace name")
+            standardButtons: Dialog.Save | Dialog.Cancel
+            parent: Overlay.overlay
+            TextField {
+                width: parent.width
+                id: wsNameText
+                selectByMouse: true
+            }
 
-        onOpened: {
-            wsNameText.text = ""
-        }
-
-        onAccepted: {
-            if (wsNameText.text.length > 0) {
-                var item = {
-                    "name": wsNameText.text
+            onAccepted: {
+                if (wsNameText.text.length > 0) {
+                    var item = {
+                        "name": wsNameText.text
+                    }
+                    item = workspaceModel.addJson(item)
+                    spaceListModel.append(item)
                 }
-                item = workspaceModel.addJson(item)
-                spaceListModel.append(item)
             }
         }
     }
@@ -164,10 +161,7 @@ Frame {
         id: addAction
         text: "Add"
         icon.source: "img/ic_add"
-        onTriggered: {
-            wsNameText.text = ""
-            addSpaceDialog.open()
-        }
+        onTriggered: asdComponent.createObject(root).open()
     }
 
     Component.onCompleted: {

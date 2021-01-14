@@ -312,8 +312,11 @@ Page {
         parent: Overlay.overlay
 
         onAccepted: {
-            actorModel.removeGroup(groupListBox.currentIndex - 1)
-            groupListModel.remove(groupListBox.currentIndex)
+            let index = groupListBox.currentIndex
+            let g = groupListModel.get(index)
+            actorModel.removeGroup(g.id)
+            groupListModel.remove(index)
+            groupListBox.currentIndex = index - 1
         }
     }
 
@@ -374,7 +377,7 @@ Page {
         var groupList = actorModel.listGroupJson()
         groupListModel.append({
                                   "name": "default",
-                                  "id" : "0"
+                                  "id": "0"
                               })
         groupList.forEach(function (group) {
             groupListModel.append(group)
@@ -384,7 +387,8 @@ Page {
     }
 
     function loadActor() {
-        let actorList = actorModel.getGroupActors(groupListModel.get(groupListBox.currentIndex).id)
+        let actorList = actorModel.getGroupActors(
+                groupListModel.get(groupListBox.currentIndex).id)
         actorListModel.clear()
         actorList.forEach(function (actor) {
             actorListModel.append(actor)

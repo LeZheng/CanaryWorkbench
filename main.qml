@@ -108,7 +108,7 @@ ApplicationWindow {
                 var workbench = workbenchComponent.createObject(
                             workbenchLayouts, {
                                 "name": space.name,
-                                "id":space.id,
+                                "id": space.id
                             })
             }
         }

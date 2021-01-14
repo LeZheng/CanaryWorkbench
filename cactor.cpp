@@ -6,6 +6,8 @@
 #include <QMetaMethod>
 #include <QDebug>
 #include <QMessageBox>
+#include "utils.h"
+#include <QSqlRecord>
 
 CActor::CActor(QObject *parent) : QObject(parent)
 {
@@ -160,7 +162,11 @@ CActorGroup::CActorGroup(QObject *parent) : QObject(parent) {}
 
 ActorModel::ActorModel(QObject *parent)
 {
-    db = QSqlDatabase::addDatabase("QSQLITE");
+    if(QSqlDatabase::contains()) {
+        db = QSqlDatabase::database();
+    } else {
+        db = QSqlDatabase::addDatabase("QSQLITE");
+    }
     db.setDatabaseName("CanaryData.db");
     if (!db.open()) {
         QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
@@ -234,11 +240,7 @@ QJsonObject ActorModel::addGroupJson(QJsonValue json)
     f.setAutoValue(true);
     f.setGenerated(true);
     groupRecord.append(f);
-
-    QSqlField nameField("name", QVariant::Int);
-    nameField.setValue(json.toObject().value("name").toString("unknown"));
-    groupRecord.append(nameField);
-
+    groupRecord.append(field("name", QVariant::String, json.toObject().value("name").toString("unknown")));
     groupModel->insertRecord(-1, groupRecord);
     groupModel->submitAll();
 
@@ -249,10 +251,16 @@ QJsonObject ActorModel::addGroupJson(QJsonValue json)
     };
 }
 
-void ActorModel::removeGroup(int index)
+void ActorModel::removeGroup(const QString &id)
 {
-    groupModel->removeRow(index);
+    for(int i = 0; i < groupModel->rowCount(); i++) {
+        if(groupModel->record(i).value("id").toString() == id) {
+            groupModel->removeRow(i);
+            break;
+        }
+    }
     groupModel->submitAll();
+    removeActors(id);
 }
 
 void ActorModel::addActor(QJsonObject json)
@@ -262,12 +270,11 @@ void ActorModel::addActor(QJsonObject json)
         QSqlRecord r;
         auto idf = QSqlField("id", QVariant::Int);
         idf.setAutoValue(true);
+        idf.setGenerated(true);
         r.append(idf);
         foreach (auto k, json.keys()) {
             auto v = json.value(k).toVariant();
-            auto f = QSqlField(k, v.type());
-            f.setValue(v);
-            r.append(f);
+            r.append(field(k, v.type(), v));
         }
         bool s = actorModel->insertRecord(-1, r);
         actorModel->submitAll();
@@ -276,12 +283,15 @@ void ActorModel::addActor(QJsonObject json)
 
 QJsonArray ActorModel::getGroupActors(QString group)
 {
-    actorMap.clear();
     QJsonArray array;
-    actorModel->setFilter(QString("groupId=%1").arg(group.toInt(0)));
-    actorModel->select();
-    for(int i = 0; i < actorModel->rowCount(); i++) {
-        auto r = actorModel->record(i);
+
+    QSqlQuery q;
+    q.prepare("SELECT * FROM c_actor WHERE groupId=?");
+    q.bindValue(0, group.toInt(0));
+    q.exec();
+
+    while(q.next()) {
+        QSqlRecord r = q.record();
         QJsonObject a;
         for(int j = 0; j < r.count(); j++) {
             auto f = r.field(j);
@@ -316,9 +326,16 @@ void ActorModel::removeActor(QString id)
 void ActorModel::removeActors(QString groupId)
 {
     db.transaction();
-    actorModel->setFilter(QString("groupId=%1").arg(groupId));
-    actorModel->select();
-    actorModel->removeRows(0, actorModel->rowCount());
+    for(int i = 0; i < actorModel->rowCount(); i++) {
+        auto r = actorModel->record(i);
+        if(r.value("groupId").toString() == groupId) {
+            actorModel->removeRow(i);
+            auto a = actorMap.take(r.value("id").toString());
+            if(a) {
+                a->deleteLater();
+            }
+        }
+    }
     actorModel->submitAll();
     db.commit();
 }

@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <cactor.h>
 #include <QMessageBox>
+#include "utils.h"
 
 Workspace::Workspace(const QString &name,QObject *parent):QObject(parent),mName(name)
 {
@@ -363,13 +364,6 @@ ActorItem *WorkspaceModel::getActor(const QString &id)
 Pipe::Pipe(QObject *parent):QObject(parent)
 {
 
-}
-
-QSqlField field(const QString &key, QVariant::Type type, QVariant value)
-{
-    QSqlField f(key, type);
-    f.setValue(value);
-    return f;
 }
 
 QSqlRecord Pipe::toRecord()

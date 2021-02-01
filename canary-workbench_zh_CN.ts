@@ -2,19 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
-    <name>HomeForm.ui</name>
-    <message>
-        <location filename="HomeForm.ui.qml" line="8"/>
-        <source>Home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="HomeForm.ui.qml" line="11"/>
-        <source>You are on the home page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <location filename="cactor.cpp" line="172"/>

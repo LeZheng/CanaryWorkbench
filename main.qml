@@ -149,6 +149,20 @@ ApplicationWindow {
         TabButton {
             id: tab
             width: 200
+
+            ToolButton {
+                id: closeButton
+                icon.source: "img/ic_close"
+                icon.color: "white"
+                anchors.right: parent.right
+                hoverEnabled: true
+                opacity: closeButton.hovered ? 1.0 : 0
+                Behavior on opacity {
+                    OpacityAnimator {}
+                }
+
+                onClicked: workbenchTabs.removeItem(tab)
+            }
         }
     }
 }

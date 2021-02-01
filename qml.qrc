@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>HomeForm.ui.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>WorkspaceForm.qml</file>
         <file>SystemMenu.qml</file>

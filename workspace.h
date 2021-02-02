@@ -280,6 +280,7 @@ public slots:
     Q_INVOKABLE void remove(const QString &name);
     Q_INVOKABLE Workspace* get(const QString &name);
     Q_INVOKABLE ActorItem* addActor( Workspace *space,QJsonObject json);
+    Q_INVOKABLE void removeActor(const QString &id);
     Q_INVOKABLE Pipe* addPipe(Workspace *space, QJsonObject json);
     Q_INVOKABLE void save(const QJsonObject &json);
     Q_INVOKABLE QJsonArray getPipeList(const QString &spaceId);

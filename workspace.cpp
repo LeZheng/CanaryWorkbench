@@ -247,8 +247,19 @@ ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
 
     actorItemModel->insertRecord(-1, actor->toRecord());
     actorItemModel->submitAll();
-
     return actor;
+}
+
+void WorkspaceModel::removeActor(const QString &id)
+{
+    for(int i = 0; i < actorItemModel->rowCount(); i++) {
+        auto r = actorItemModel->record(i);
+        if(r.value("id").toString() == id) {
+            actorItemModel->removeRow(i);
+            actorItemModel->submitAll();
+            break;
+        }
+    }
 }
 
 Pipe *WorkspaceModel::addPipe(Workspace *space, QJsonObject json)

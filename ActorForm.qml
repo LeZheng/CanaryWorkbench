@@ -432,6 +432,7 @@ Rectangle {
 
         onTriggered: {
             //TODO delete pipe first
+            workspaceModel.removeActor(actorItem.id)
             formRoot.destroy()
         }
     }

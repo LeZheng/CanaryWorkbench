@@ -130,8 +130,7 @@ Pane {
                                                })
         root.actorFormMap[actor.id] = form
         form.Component.onDestruction.connect(function () {
-            console.log("addActor:delete")
-            root.actorFormMap[actor.id] = null //TODO delete key
+            root.actorFormMap[actor.id] = null
         })
     }
 
@@ -190,13 +189,14 @@ Pane {
     Component.onCompleted: {
         workspace = workspaceModel.get(id)
         let actorList = workspaceModel.getActorList(workspace.id)
-        for (let i = 0; i < actorList.length; i++) {
+        for (var i = 0; i < actorList.length; i++) {
             addActor(actorList[i])
         }
         let pipeList = workspaceModel.getPipeList(workspace.id)
-        for (let i = 0; i < pipeList.length; i++) {
+        for (var i = 0; i < pipeList.length; i++) {
             addPipe(pipeList[i])
         }
-        console.log("workspaceForm complete:", workspace.id, JSON.stringify(actorList), pipeList)
+        console.log("workspaceForm complete:", workspace.id,
+                    JSON.stringify(actorList), pipeList)
     }
 }

@@ -14,7 +14,7 @@ class Pipe : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString mId READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(QString spaceId READ spaceId WRITE setSpaceId NOTIFY spaceIdChanged)
     Q_PROPERTY(QString inputId READ inputId WRITE setInputId NOTIFY inputIdChanged)
     Q_PROPERTY(QString outputId READ outputId WRITE setOutputId NOTIFY outputIdChanged)

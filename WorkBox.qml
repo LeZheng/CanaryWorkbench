@@ -107,7 +107,8 @@ Page {
             Drag.dragType: Drag.Automatic
             Drag.mimeData: {
                 "id": id,
-                "name": name,
+                "name"//FIXME is null
+                : name,
                 "type": type,
                 "form": form
             }

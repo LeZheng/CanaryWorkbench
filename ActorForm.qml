@@ -234,7 +234,7 @@ Rectangle {
     Component.onCompleted: {
         console.log("complete:", actorItem)
         let actor = actorItem.impl
-        formRoot.form = actor.form
+        formRoot.form = actor.form //FIXME first add is null
         formRoot.type = actor.type
         formRoot.name = actor.name
         if (form.length > 0) {

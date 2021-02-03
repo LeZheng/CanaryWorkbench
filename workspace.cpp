@@ -247,6 +247,7 @@ ActorItem *WorkspaceModel::addActor( Workspace *space, QJsonObject json)
 
     actorItemModel->insertRecord(-1, actor->toRecord());
     actorItemModel->submitAll();
+    actor->setId(actorItemModel->record(actorItemModel->rowCount() - 1).value("id").toString());
     return actor;
 }
 
@@ -260,6 +261,14 @@ void WorkspaceModel::removeActor(const QString &id)
             break;
         }
     }
+    for(int i = 0; i < pipeItemModel->rowCount(); i++) {
+        auto r = pipeItemModel->record(i);
+        if(r.value("inputId").toString() == id || r.value("outputId").toString() == id) {
+            pipeItemModel->removeRow(i);
+        }
+    }
+    pipeItemModel->submitAll();
+
 }
 
 Pipe *WorkspaceModel::addPipe(Workspace *space, QJsonObject json)
@@ -273,6 +282,7 @@ Pipe *WorkspaceModel::addPipe(Workspace *space, QJsonObject json)
 
     pipeItemModel->insertRecord(-1, pipe->toRecord());
     pipeItemModel->submitAll();
+    pipe->setId(pipeItemModel->record(pipeItemModel->rowCount() - 1).value("id").toString());
     return pipe;
 }
 
@@ -332,6 +342,7 @@ QJsonArray WorkspaceModel::getActorList(const QString &spaceId)
 
 Pipe *WorkspaceModel::getPipe(const QString &id)
 {
+    qDebug() << "WorkspaceModel get Pipe " << id;
     QSqlQuery q(db);
     q.prepare("SELECT * FROM c_pipe_item WHERE id=?");
     q.bindValue(0, id);

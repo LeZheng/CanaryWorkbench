@@ -30,32 +30,32 @@ Click Cancel to exit.</source>
 <context>
     <name>WorkBox</name>
     <message>
-        <location filename="WorkBox.qml" line="206"/>
+        <location filename="WorkBox.qml" line="207"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="217"/>
+        <location filename="WorkBox.qml" line="218"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="223"/>
+        <location filename="WorkBox.qml" line="224"/>
         <source>Clear All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="264"/>
+        <location filename="WorkBox.qml" line="265"/>
         <source>Add...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="283"/>
+        <location filename="WorkBox.qml" line="284"/>
         <source>Please input group name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="WorkBox.qml" line="312"/>
+        <location filename="WorkBox.qml" line="313"/>
         <source>Are you confirm to delete the group?</source>
         <translation type="unfinished"></translation>
     </message>

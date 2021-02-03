@@ -66,7 +66,6 @@ Pane {
                         "x": drop.x,
                         "y": drop.y,
                         "name": drop.getDataAsString("name"),
-                        "id": drop.getDataAsString("id") + time,
                         "actorId": drop.getDataAsString("id"),
                         "type": drop.getDataAsString("type"),
                         "form": drop.getDataAsString("form")
@@ -170,7 +169,6 @@ Pane {
                     "slotName": slotName
                 }
                 var pipe = workspaceModel.addPipe(workspace, pipeJson)
-                console.log("add pipe:", pipe, JSON.stringify(pipeJson))
                 addPipe(pipe)
             }
             onStateChanged: {

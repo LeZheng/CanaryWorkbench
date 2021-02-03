@@ -374,7 +374,7 @@ Page {
                     "form": "CmdActor.qml"
                 }
 
-                actorModel.addActor(actor)
+                actor = actorModel.addActor(actor)
                 actorListModel.append(actor)
             }
         }

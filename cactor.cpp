@@ -263,7 +263,7 @@ void ActorModel::removeGroup(const QString &id)
     removeActors(id);
 }
 
-void ActorModel::addActor(QJsonObject json)
+CActor* ActorModel::addActor(QJsonObject json)
 {
     auto actor = CActorFactory::create(json, this);
     if (actor) {
@@ -278,7 +278,12 @@ void ActorModel::addActor(QJsonObject json)
         }
         bool s = actorModel->insertRecord(-1, r);
         actorModel->submitAll();
+        actor->setId(actorModel->record(actorModel->rowCount() - 1).value("id").toString());
+        if(!actorMap.contains(actor->id())) {
+            actorMap.insert(actor->id(), actor);
+        }
     }
+    return actor;
 }
 
 QJsonArray ActorModel::getGroupActors(QString group)
@@ -299,9 +304,11 @@ QJsonArray ActorModel::getGroupActors(QString group)
         }
         array.append(a);
 
-        auto actor = CActorFactory::create(r, this);
-        if(actor != nullptr) {
-            actorMap.insert(actor->id(), actor);
+        if(!actorMap.contains(a.value("id").toString())) {
+            auto actor = CActorFactory::create(r, this);
+            if(actor != nullptr) {
+                actorMap.insert(actor->id(), actor);
+            }
         }
     }
     return array;

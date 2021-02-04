@@ -110,7 +110,7 @@ Frame {
                     var item = {
                         "name": wsNameText.text
                     }
-                    item = workspaceModel.addJson(item)
+                    item = workspaceModel.addSpace(item)
                     spaceListModel.append(item)
                 }
             }
@@ -165,7 +165,7 @@ Frame {
     }
 
     Component.onCompleted: {
-        var list = workspaceModel.listJson()
+        var list = workspaceModel.getSpaceList()
         spaceListModel.clear()
         list.forEach(function (w) {
             spaceListModel.append(w)

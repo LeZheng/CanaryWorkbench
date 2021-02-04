@@ -186,7 +186,7 @@ public slots:
     Q_INVOKABLE QJsonObject addGroupJson(QJsonValue json);
     Q_INVOKABLE void removeGroup(const QString &id);
     Q_INVOKABLE CActor* addActor(QJsonObject json);
-    Q_INVOKABLE QJsonArray getGroupActors(QString group);
+    Q_INVOKABLE QVariant getGroupActorList(const QString &groupId);
     Q_INVOKABLE CActor* getActor(const QString &id);
     Q_INVOKABLE void removeActor(QString name);
     Q_INVOKABLE void removeActors(QString groupId);

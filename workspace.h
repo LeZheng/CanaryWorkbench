@@ -275,16 +275,16 @@ public:
     WorkspaceModel(ActorModel *actorModel, QObject *parent = nullptr);
 
 public slots:
-    Q_INVOKABLE QJsonArray listJson();
-    Q_INVOKABLE QJsonValue addJson(QJsonValue json);
+    Q_INVOKABLE QVariant getSpaceList();
+    Q_INVOKABLE Workspace* addSpace(QJsonValue json);
     Q_INVOKABLE void remove(const QString &name);
     Q_INVOKABLE Workspace* get(const QString &name);
     Q_INVOKABLE ActorItem* addActor( Workspace *space,QJsonObject json);
     Q_INVOKABLE void removeActor(const QString &id);
     Q_INVOKABLE Pipe* addPipe(Workspace *space, QJsonObject json);
     Q_INVOKABLE void save(const QJsonObject &json);
-    Q_INVOKABLE QJsonArray getPipeList(const QString &spaceId);
-    Q_INVOKABLE QJsonArray getActorList(const QString &spaceId);
+    Q_INVOKABLE QVariant getPipeList(const QString &spaceId);
+    Q_INVOKABLE QVariant getActorList(const QString &spaceId);
     Q_INVOKABLE Pipe * getPipe(const QString &id);
     Q_INVOKABLE ActorItem * getActor(const QString &id);
 private:

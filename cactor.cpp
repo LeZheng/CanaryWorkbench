@@ -286,32 +286,28 @@ CActor* ActorModel::addActor(QJsonObject json)
     return actor;
 }
 
-QJsonArray ActorModel::getGroupActors(QString group)
+QVariant ActorModel::getGroupActorList(const QString &groupId)
 {
-    QJsonArray array;
-
+    QObjectList actorList;
     QSqlQuery q;
     q.prepare("SELECT * FROM c_actor WHERE groupId=?");
-    q.bindValue(0, group.toInt(0));
+    q.bindValue(0, groupId.toInt(0));
     q.exec();
 
     while(q.next()) {
         QSqlRecord r = q.record();
-        QJsonObject a;
-        for(int j = 0; j < r.count(); j++) {
-            auto f = r.field(j);
-            a.insert(f.name(), f.value().toString());
-        }
-        array.append(a);
-
-        if(!actorMap.contains(a.value("id").toString())) {
+        auto id = r.value("id").toString();
+        if(actorMap.contains(id)) {
+            actorList.append(actorMap.value(id));
+        } else {
             auto actor = CActorFactory::create(r, this);
             if(actor != nullptr) {
                 actorMap.insert(actor->id(), actor);
             }
+            actorList.append(actor);
         }
     }
-    return array;
+    return QVariant::fromValue(actorList);
 }
 
 void ActorModel::removeActor(QString id)

@@ -2,6 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 2.13
 import QtQuick.Layouts 1.12
 import QtGraphicalEffects 1.12
+import CActor 1.0
 
 Page {
     id: root
@@ -107,8 +108,7 @@ Page {
             Drag.dragType: Drag.Automatic
             Drag.mimeData: {
                 "id": id,
-                "name"//FIXME is null
-                : name,
+                "name": name,
                 "type": type,
                 "form": form
             }
@@ -394,7 +394,7 @@ Page {
     }
 
     function loadActor() {
-        let actorList = actorModel.getGroupActors(
+        let actorList = actorModel.getGroupActorList(
                 groupListModel.get(groupListBox.currentIndex).id)
         actorListModel.clear()
         actorList.forEach(function (actor) {

@@ -6,7 +6,7 @@ import ActorItem 1.0
 
 Rectangle {
     id: formRoot
-
+    z: 5
     border.width: 1
     border.color: "black"
     color: "white"
@@ -63,7 +63,7 @@ Rectangle {
 
     MouseArea {
         id: dragArea
-        z: 1
+        z: 6
         hoverEnabled: true
         anchors.fill: parent
         drag.target: formRoot
@@ -99,7 +99,7 @@ Rectangle {
     MouseArea {
         id: leftFrame
         width: frameWidth
-        z: 3
+        z: 8
         cursorShape: Qt.SizeHorCursor
         anchors {
             topMargin: frameWidth
@@ -124,7 +124,7 @@ Rectangle {
     MouseArea {
         id: topFrame
         height: frameWidth
-        z: 3
+        z: 8
         cursorShape: Qt.SizeVerCursor
         anchors {
             leftMargin: frameWidth
@@ -149,7 +149,7 @@ Rectangle {
     MouseArea {
         id: rightFrame
         width: frameWidth
-        z: 3
+        z: 8
         cursorShape: Qt.SizeHorCursor
         anchors {
             topMargin: frameWidth
@@ -173,7 +173,7 @@ Rectangle {
     MouseArea {
         id: bottomFrame
         width: frameWidth
-        z: 3
+        z: 8
         cursorShape: Qt.SizeVerCursor
         anchors {
             leftMargin: frameWidth
@@ -206,7 +206,7 @@ Rectangle {
         id: actorCloseBtn
         width: 30
         height: 30
-        z: 2
+        z: 7
         anchors {
             top: parent.top
             right: parent.right
@@ -251,7 +251,7 @@ Rectangle {
         width: 8
         height: 8
         radius: 5
-        z: 3
+        z: 8
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
 
@@ -278,7 +278,7 @@ Rectangle {
         width: 8
         height: 8
         radius: 5
-        z: 3
+        z: 8
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
 
@@ -305,7 +305,7 @@ Rectangle {
         width: 8
         height: 8
         radius: 5
-        z: 3
+        z: 8
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
 

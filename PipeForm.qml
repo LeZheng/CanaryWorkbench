@@ -26,25 +26,35 @@ Item {
                                         targetForm.height / 2)
     }
 
-    onSourceFormChanged: {
-        //        if (sourceForm === null) {
-        //            formRoot.destroy()
-        //        } else {
-        sourceForm.onXChanged.connect(updatePathPoint)
-        sourceForm.onYChanged.connect(updatePathPoint)
-        sourceForm.onHeightChanged.connect(updatePathPoint)
-        sourceForm.onWidthChanged.connect(updatePathPoint)
-        //        }
+    Connections {
+        target: sourceForm
+        function onXChanged() {
+            updatePathPoint()
+        }
+        function onYChanged() {
+            updatePathPoint()
+        }
+        function onHeightChanged() {
+            updatePathPoint()
+        }
+        function onWidthChanged() {
+            updatePathPoint()
+        }
     }
-    onTargetFormChanged: {
-        //        if (targetForm === null) {
-        //            formRoot.destroy()
-        //        } else {
-        targetForm.onXChanged.connect(updatePathPoint)
-        targetForm.onYChanged.connect(updatePathPoint)
-        targetForm.onHeightChanged.connect(updatePathPoint)
-        targetForm.onWidthChanged.connect(updatePathPoint)
-        //        }
+    Connections {
+        target: targetForm
+        function onXChanged() {
+            updatePathPoint()
+        }
+        function onYChanged() {
+            updatePathPoint()
+        }
+        function onHeightChanged() {
+            updatePathPoint()
+        }
+        function onWidthChanged() {
+            updatePathPoint()
+        }
     }
 
     anchors {
@@ -103,7 +113,6 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("complete => ", sourceForm)
         updatePathPoint()
     }
 }

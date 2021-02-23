@@ -80,17 +80,13 @@ ApplicationWindow {
         id: drawer
         width: window.width * 0.33
         height: window.height
-
-        SystemMenu {
-            anchors.fill: parent
-        }
     }
 
     SplitView {
         anchors.fill: parent
         orientation: Qt.Horizontal
 
-        SpaceListForm {
+        SpaceList {
             id: spaceListForm
             SplitView.preferredWidth: window.width * 0.2
 
@@ -130,7 +126,7 @@ ApplicationWindow {
             }
         }
 
-        WorkBox {
+        ActorList {
             SplitView.preferredWidth: window.width * 0.2
         }
     }
@@ -138,7 +134,7 @@ ApplicationWindow {
     Component {
         id: workbenchComponent
 
-        WorkspaceForm {
+        SpaceItem {
             id: workbench
         }
     }

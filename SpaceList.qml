@@ -1,0 +1,111 @@
+import QtQuick 2.12
+import QtQuick.Controls 2.12
+
+SpaceListForm {
+    id: root
+
+    rootArea.onClicked: contextMenu.popup(mouse.x, mouse.y)
+
+    addAction.onTriggered: asdComponent.createObject(root).open()
+    removeAction.onTriggered: {
+        let data = spaceListModel.get(itemMenu.spaceIndex)
+        workspaceModel.remove(data.id)
+        spaceListModel.remove(itemMenu.spaceIndex)
+    }
+    saveAction.onTriggered: workspaceModel.save(currentItem)
+
+    listView.delegate: Frame {
+        id: itemRoot
+        x: 5
+        width: parent.width
+        height: 64
+
+        Image {
+            id: spaceIcon
+            width: 48
+            height: 48
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 4
+            source: "img/ic_def_space"
+        }
+
+        Text {
+            anchors.top: spaceIcon.top
+            anchors.left: spaceIcon.right
+            anchors.right: parent.right
+            anchors.margins: 8
+            text: name
+            font.weight: Font.Light
+            font.bold: true
+        }
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: {
+                if (mouse.button == Qt.RightButton) {
+                    itemMenu.spaceIndex = index
+                    itemMenu.popup(itemRoot)
+                } else {
+                    listView.currentIndex = index
+                    currentItem = spaceListModel.get(index)
+                }
+                mouse.accepted = true
+            }
+
+            onPressAndHold: {
+                if (mouse.button == Qt.LeftButton) {
+                    itemMenu.spaceIndex = index
+                    itemMenu.popup(itemRoot)
+                }
+            }
+
+            onDoubleClicked: root.workbenchOpenRequested(
+                                 spaceListModel.get(index))
+        }
+    }
+
+    Component {
+        id: asdComponent
+        Dialog {
+            id: addSpaceDialog
+            width: 300
+            height: 200
+            anchors.centerIn: Overlay.overlay
+
+            title: qsTr("Please enter workspace name")
+            standardButtons: Dialog.Save | Dialog.Cancel
+            parent: Overlay.overlay
+            TextField {
+                width: parent.width
+                id: wsNameText
+                selectByMouse: true
+            }
+
+            onAccepted: {
+                if (wsNameText.text.length > 0) {
+                    var item = {
+                        "name": wsNameText.text
+                    }
+                    item = workspaceModel.addSpace(item)
+                    spaceListModel.append(item)
+                }
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        var list = workspaceModel.getSpaceList()
+        spaceListModel.clear()
+        list.forEach(function (w) {
+            spaceListModel.append(w)
+        })
+
+        itemMenu.addAction(removeAction)
+        itemMenu.addAction(editAction)
+        itemMenu.addAction(saveAction)
+
+        contextMenu.addAction(addAction)
+    }
+}

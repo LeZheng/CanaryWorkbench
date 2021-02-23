@@ -2,6 +2,42 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>ActorList</name>
+    <message>
+        <location filename="ActorList.qml" line="125"/>
+        <source>Please input group name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ActorList.qml" line="153"/>
+        <source>Are you confirm to delete the group?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ActorListForm.ui</name>
+    <message>
+        <location filename="ActorListForm.ui.qml" line="34"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ActorListForm.ui.qml" line="39"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ActorListForm.ui.qml" line="45"/>
+        <source>Clear All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ActorListForm.ui.qml" line="161"/>
+        <source>Add...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="cactor.cpp" line="172"/>
@@ -20,43 +56,10 @@ Click Cancel to exit.</source>
     </message>
 </context>
 <context>
-    <name>SpaceListForm</name>
+    <name>SpaceList</name>
     <message>
-        <location filename="SpaceListForm.qml" line="99"/>
+        <location filename="SpaceList.qml" line="77"/>
         <source>Please enter workspace name</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>WorkBox</name>
-    <message>
-        <location filename="WorkBox.qml" line="207"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WorkBox.qml" line="218"/>
-        <source>Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WorkBox.qml" line="224"/>
-        <source>Clear All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WorkBox.qml" line="265"/>
-        <source>Add...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WorkBox.qml" line="284"/>
-        <source>Please input group name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="WorkBox.qml" line="313"/>
-        <source>Are you confirm to delete the group?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

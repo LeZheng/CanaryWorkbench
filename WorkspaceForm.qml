@@ -3,8 +3,8 @@ import QtQuick 2.12
 import QtQuick.Shapes 1.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
-import Workspace 1.0
-import ActorItem 1.0
+import CWorkspace 1.0
+import CActorItem 1.0
 
 Pane {
     id: root
@@ -12,7 +12,7 @@ Pane {
 
     property string colorKey
     property string id
-    property Workspace workspace
+    property CWorkspace workspace
     property var actorFormMap: Object()
 
     width: 400
@@ -150,7 +150,7 @@ Pane {
     Component {
         id: actorComponent
 
-        ActorForm {
+        ActorItem {
             id: actorForm
             Drag.supportedActions: Qt.MoveAction
             Drag.dragType: Drag.Internal
@@ -176,7 +176,7 @@ Pane {
 
     Component {
         id: pipeComponent
-        PipeForm {
+        PipeItem {
             id: pipeForm
         }
     }

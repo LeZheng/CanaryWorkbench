@@ -18,11 +18,11 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    qmlRegisterType<ActorItem>("ActorItem", 1, 0, "ActorItem");
-    qmlRegisterType<Pipe>("Pipe", 1, 0, "Pipe");
+    qmlRegisterType<ActorItem>("CActorItem", 1, 0, "CActorItem");
+    qmlRegisterType<Pipe>("CPipe", 1, 0, "CPipe");
     qmlRegisterType<CActor>("CActor", 1, 0, "CActor");
 //    qmlRegisterType<Workspace>("Workspace", 1, 0, "Workspace");
-    qmlRegisterUncreatableType<Workspace>("Workspace", 1,0,"Workspace",QLatin1String("Workspace are read-only"));
+    qmlRegisterUncreatableType<Workspace>("CWorkspace", 1,0,"CWorkspace",QLatin1String("CWorkspace are read-only"));
     qmlRegisterUncreatableType<WorkspaceModel>("WorkspaceModel", 1,0,"WorkspaceModel",QLatin1String("WorkspaceModel are read-only"));
     qmlRegisterUncreatableType<CActorGroup>("CActorGroup", 1,0,"CActorGroup",QLatin1String("CActorGroup are read-only"));
 

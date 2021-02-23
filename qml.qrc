@@ -3,13 +3,18 @@
         <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>WorkspaceForm.qml</file>
-        <file>SystemMenu.qml</file>
-        <file>WorkBox.qml</file>
-        <file>SpaceListForm.qml</file>
         <file>CmdActor.qml</file>
-        <file>ActorForm.qml</file>
-        <file>PipeForm.qml</file>
         <file>ArgumentDialog.qml</file>
+        <file>PipeItem.qml</file>
+        <file>PipeItemForm.ui.qml</file>
+        <file>ActorItem.qml</file>
+        <file>ActorItemForm.ui.qml</file>
+        <file>ActorList.qml</file>
+        <file>ActorListForm.ui.qml</file>
+        <file>SpaceList.qml</file>
+        <file>SpaceListForm.ui.qml</file>
+        <file>SpaceItem.qml</file>
+        <file>SpaceItemForm.ui.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="main_bg">img/main_bg.png</file>

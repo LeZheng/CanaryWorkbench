@@ -14,56 +14,28 @@ SpaceListForm {
     }
     saveAction.onTriggered: workspaceModel.save(currentItem)
 
-    listView.delegate: Frame {
-        id: itemRoot
-        x: 5
-        width: parent.width
-        height: 64
+    listView.model: ListModel {
+        id: spaceListModel
+    }
 
-        Image {
-            id: spaceIcon
-            width: 48
-            height: 48
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.leftMargin: 4
-            source: "img/ic_def_space"
+    listView.delegate: SpaceDelegate {
+        onItemMenuRequested: {
+            itemMenu.spaceIndex = index
+            itemMenu.popup(itemRoot)
         }
 
-        Text {
-            anchors.top: spaceIcon.top
-            anchors.left: spaceIcon.right
-            anchors.right: parent.right
-            anchors.margins: 8
-            text: name
-            font.weight: Font.Light
-            font.bold: true
+        onItemClicked: {
+            listView.currentIndex = index
+            currentItem = spaceListModel.get(index)
         }
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: {
-                if (mouse.button == Qt.RightButton) {
-                    itemMenu.spaceIndex = index
-                    itemMenu.popup(itemRoot)
-                } else {
-                    listView.currentIndex = index
-                    currentItem = spaceListModel.get(index)
-                }
-                mouse.accepted = true
-            }
 
-            onPressAndHold: {
-                if (mouse.button == Qt.LeftButton) {
-                    itemMenu.spaceIndex = index
-                    itemMenu.popup(itemRoot)
-                }
-            }
+        onItemLongClicked: {
+            itemMenu.spaceIndex = index
+            itemMenu.popup(itemRoot)
+        }
 
-            onDoubleClicked: root.workbenchOpenRequested(
+        onItemDoubleClicked: root.workbenchOpenRequested(
                                  spaceListModel.get(index))
-        }
     }
 
     Component {

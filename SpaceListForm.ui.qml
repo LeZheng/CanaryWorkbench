@@ -10,12 +10,10 @@ Frame {
 
     property var currentItem: null
     property alias currentIndex: listView.currentIndex
-    property alias count: spaceListModel.count
     property alias rootArea: rootArea
     property alias listView: listView
     property alias itemMenu: itemMenu
     property alias contextMenu: contextMenu
-    property alias spaceListModel: spaceListModel
 
     MouseArea {
         id: rootArea
@@ -27,9 +25,6 @@ Frame {
         id: listView
         anchors.fill: parent
         focus: true
-        model: ListModel {
-            id: spaceListModel
-        }
         spacing: 8
 
         footer: Button {

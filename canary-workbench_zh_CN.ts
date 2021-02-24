@@ -4,12 +4,17 @@
 <context>
     <name>ActorList</name>
     <message>
-        <location filename="ActorList.qml" line="125"/>
+        <location filename="ActorList.qml" line="77"/>
+        <source>Add...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ActorList.qml" line="96"/>
         <source>Please input group name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ActorList.qml" line="153"/>
+        <location filename="ActorList.qml" line="124"/>
         <source>Are you confirm to delete the group?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -17,23 +22,18 @@
 <context>
     <name>ActorListForm.ui</name>
     <message>
-        <location filename="ActorListForm.ui.qml" line="34"/>
+        <location filename="ActorListForm.ui.qml" line="32"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ActorListForm.ui.qml" line="39"/>
+        <location filename="ActorListForm.ui.qml" line="37"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ActorListForm.ui.qml" line="45"/>
+        <location filename="ActorListForm.ui.qml" line="42"/>
         <source>Clear All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ActorListForm.ui.qml" line="161"/>
-        <source>Add...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -58,7 +58,7 @@ Click Cancel to exit.</source>
 <context>
     <name>SpaceList</name>
     <message>
-        <location filename="SpaceList.qml" line="77"/>
+        <location filename="SpaceList.qml" line="49"/>
         <source>Please enter workspace name</source>
         <translation type="unfinished"></translation>
     </message>

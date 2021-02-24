@@ -99,12 +99,14 @@ ApplicationWindow {
                 }
 
                 var tab = tabComponent.createObject(workbenchTabs, {
-                                                        "text": space.name
+                                                        "text": space.name,
+                                                        "space": space
                                                     })
                 var workbench = workbenchComponent.createObject(
                             workbenchLayouts, {
                                 "name": space.name,
-                                "id": space.id
+                                "id": space.id,
+                                "space": space
                             })
             }
         }
@@ -136,6 +138,8 @@ ApplicationWindow {
 
         SpaceItem {
             id: workbench
+
+            property var space: null
         }
     }
 
@@ -145,6 +149,8 @@ ApplicationWindow {
         TabButton {
             id: tab
             width: 200
+
+            property var space: null
 
             ToolButton {
                 id: closeButton
@@ -157,7 +163,15 @@ ApplicationWindow {
                     OpacityAnimator {}
                 }
 
-                onClicked: workbenchTabs.removeItem(tab)
+                onClicked: {
+                    workbenchTabs.removeItem(tab)
+                    for (var i = 0; i < workbenchLayouts.children.length; i++) {
+                        if (workbenchLayouts.children[i].space.id === tab.space.id) {
+                            workbenchLayouts.children[i].destroy()
+                            break
+                        }
+                    }
+                }
             }
         }
     }

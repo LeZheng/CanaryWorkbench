@@ -11,9 +11,7 @@ Page {
 
     background: null
 
-    property ListModel groupListModel: ListModel {}
     property alias actorSetView: actorSetView
-    property ListModel actorListModel: ListModel {}
     property alias rootArea: rootArea
     property alias groupListBox: groupListBox
     property alias addGroupButton: addGroupButton
@@ -41,7 +39,6 @@ Page {
     }
 
     property Action clearAllAction: Action {
-        id: clearAllAction
         text: qsTr("Clear All")
         icon.source: "img/ic_clear"
     }
@@ -116,7 +113,6 @@ Page {
         anchors.margins: 4
         spacing: 5
         focus: true
-        model: actorListModel
     }
 
     ToolTip {
@@ -124,48 +120,5 @@ Page {
         delay: 500
         visible: false
         timeout: 1000
-    }
-
-    Menu {
-        id: addMenu
-
-        MenuItem {
-            action: addFunctionAction
-        }
-        MenuItem {
-            action: addCmdAction
-        }
-    }
-
-    Menu {
-        id: itemMenu
-
-        MenuItem {
-            action: deleteActorAction
-        }
-        MenuItem {
-            action: editActorAction
-        }
-    }
-
-    Menu {
-        id: contextMenu
-
-        MenuItem {
-            action: clearAllAction
-        }
-
-        MenuSeparator {}
-
-        Menu {
-            title: qsTr("Add...")
-
-            MenuItem {
-                action: addFunctionAction
-            }
-            MenuItem {
-                action: addCmdAction
-            }
-        }
     }
 }
